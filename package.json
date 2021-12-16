@@ -1,0 +1,21 @@
+{
+  "name": "@zerosnacks/carbon",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Various experiments with carbon credits on chain",
+  "files": [
+    "src/**/*.sol"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zerosnacks/carbon.git"
+  },
+  "devDependencies": {
+    "prettier": "^2.3.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.13"
+  },
+  "scripts": {
+    "lint": "prettier --write src/**/*.sol"
+  }
+}
