@@ -38,10 +38,7 @@ contract Diamond is ERC721, Auth {
         string memory _symbol,
         string memory _baseURI,
         uint256 _maxSupply
-    )
-        ERC721(_name, _symbol)
-        Auth(Auth(msg.sender).owner(), Auth(msg.sender).authority())
-    {
+    ) ERC721(_name, _symbol) Auth(Auth(msg.sender).owner(), Auth(msg.sender).authority()) {
         baseURI = _baseURI;
         maxSupply = _maxSupply;
     }
@@ -59,11 +56,7 @@ contract Diamond is ERC721, Auth {
 
         for (uint256 i = 0; i < amount; i++) {
             if (totalSupply < maxSupply) {
-                _mint(
-                    to,
-                    totalSupply,
-                    string(abi.encodePacked(baseURI, totalSupply))
-                );
+                _mint(to, totalSupply, string(abi.encodePacked(baseURI, totalSupply)));
             }
         }
     }

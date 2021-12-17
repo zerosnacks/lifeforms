@@ -6,7 +6,7 @@ import {Base64} from "../libraries/Base64.sol";
 import {Strings} from "../libraries/Strings.sol";
 
 /// @title NFTSVG
-/// @notice Provides a function for generating an SVG associated with a Uniswap NFT
+/// @notice Provides a function for generating an SVG
 library NFTSVG {
     using Strings for uint256;
 

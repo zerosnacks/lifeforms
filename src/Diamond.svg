@@ -6,8 +6,9 @@
         <clipPath id="c2">
             <rect x="16" y="16" width="268" height="468" rx="26" ry="26" />
         </clipPath>
-        <pattern id="p1" width='20' height='40' patternUnits='userSpaceOnUse' patternTransform='scale(.5)'>
-            <path d='M0 30h20L10 50zm-10-20h20L0 30zm20 0h20L20 30zM0-10h20L10 10z' stroke-width='1' stroke='rgba(0,0,128,.1)' fill='none'/>
+        <pattern id="p1" width="20" height="40" patternUnits="userSpaceOnUse" patternTransform="scale(.5)">
+            <rect x="0" y="0" width="20" height="40" fill="rgba(0,0,0,1)" />
+            <path d="M0 30h20L10 50zm-10-20h20L0 30zm20 0h20L20 30zM0-10h20L10 10z" stroke-width="1" stroke="rgba(255,255,255,.25)" fill="none"/>
         </pattern>
         <filter id="f1">
             <!-- <feImage result="p0" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMzAwJyBoZWlnaHQ9JzUwMCcgdmlld0JveD0nMCAwIDMwMCA1MDAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PHJlY3Qgd2lkdGg9JzI5MHB4JyBoZWlnaHQ9JzI5MHB4JyBmaWxsPScjMWY5ODQwJy8+PC9zdmc+"/> -->
@@ -28,17 +29,17 @@
     </defs>
     <g clip-path="url(#c1)">
         <rect x="0" y="0" width="300" height="500" rx="38" ry="38" fill="url(#p1)"/>
-        <rect x="0" y="0" width="300" height="500" rx="38" ry="38" fill="none" stroke="rgba(0,0,128,.25)" stroke-width="1" />
+        <rect x="0" y="0" width="300" height="500" rx="38" ry="38" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1" />
         <rect x="16" y="16" width="268" height="468" rx="26" ry="26" fill="none" stroke="rgba(255,255,255,1)" stroke-width="4" />
 
         <g clip-path="url(#c2)">
             <rect x="16" y="16" width="268" height="468" rx="26" ry="26" fill="rgba(255,255,255,1)" style="filter:url(#f2)" />
-            <rect x="22" y="22" width="256" height="456" rx="26" ry="26" fill="none" style="filter:url(#f1)" stroke="rgba(0,0,128,.1)" stroke-width="1" />
+            <rect x="22" y="22" width="256" height="456" rx="26" ry="26" fill="none" style="filter:url(#f1)" stroke="rgba(0,0,0,.1)" stroke-width="1" />
             <rect x="16" y="16" width="268" height="468" rx="26" ry="26" fill="none" style="filter: url(#f3)" />
         </g>
     </g>
     <rect x="16" y="16" width="268" height="468" rx="26" ry="26" fill="none" stroke="rgba(255,255,255,1)" stroke-width="4" />
-    <rect x="16" y="16" width="268" height="468" rx="26" ry="26" fill="none" stroke="rgba(0,0,128,.5)" stroke-width="1" />
+    <rect x="16" y="16" width="268" height="468" rx="26" ry="26" fill="none" stroke="rgba(0,0,0,.5)" stroke-width="1" />
 </svg>
 
 <!-- Generate stars -->
