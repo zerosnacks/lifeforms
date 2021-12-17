@@ -3,7 +3,6 @@ pragma solidity >=0.8.0;
 
 // Libraries
 import {Base64} from "../libraries/Base64.sol";
-import {BitMath} from "../libraries/BitMath.sol";
 import {Strings} from "../libraries/Strings.sol";
 
 /// @title NFTSVG
@@ -12,11 +11,6 @@ library NFTSVG {
     using Strings for uint256;
 
     struct SVGParams {
-        string quoteToken;
-        string baseToken;
-        address poolAddress;
-        string quoteTokenSymbol;
-        string baseTokenSymbol;
         string color0;
         string color1;
         string color2;
@@ -29,42 +23,11 @@ library NFTSVG {
         string y3;
     }
 
-    function generateSVG(SVGParams memory params)
-        internal
-        pure
-        returns (string memory svg)
-    {
-        /*
-        address: "0xe8ab59d3bcde16a29912de83a90eb39628cfc163",
-        msg: "Forged in SVG for Uniswap in 2021 by 0xe8ab59d3bcde16a29912de83a90eb39628cfc163",
-        sig: "0x2df0e99d9cbfec33a705d83f75666d98b22dea7c1af412c584f7d626d83f02875993df740dc87563b9c73378f8462426da572d7989de88079a382ad96c57b68d1b",
-        version: "2"
-        */
-        return
-            string(
-                abi.encodePacked(
-                    generateSVGDefs(params),
-                    generateSVGBorderText(
-                        params.quoteToken,
-                        params.baseToken,
-                        params.quoteTokenSymbol,
-                        params.baseTokenSymbol
-                    ),
-                    generateSVGCardMantle(
-                        params.quoteTokenSymbol,
-                        params.baseTokenSymbol,
-                        params.feeTier
-                    ),
-                    "</svg>"
-                )
-            );
+    function generateSVG(SVGParams memory params) internal pure returns (string memory svg) {
+        return string(abi.encodePacked(generateSVGDefs(params), "</svg>"));
     }
 
-    function generateSVGDefs(SVGParams memory params)
-        private
-        pure
-        returns (string memory svg)
-    {
+    function generateSVGDefs(SVGParams memory params) private pure returns (string memory svg) {
         svg = string(
             abi.encodePacked(
                 '<svg width="290" height="500" viewBox="0 0 290 500" xmlns="http://www.w3.org/2000/svg"',
@@ -145,58 +108,6 @@ library NFTSVG {
                 '<rect fill="none" x="0px" y="0px" width="290px" height="500px" />',
                 '<ellipse cx="50%" cy="0px" rx="180px" ry="120px" fill="#000" opacity="0.85" /></g>',
                 '<rect x="0" y="0" width="290" height="500" rx="42" ry="42" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.2)" /></g>'
-            )
-        );
-    }
-
-    function generateSVGBorderText(
-        string memory quoteToken,
-        string memory baseToken,
-        string memory quoteTokenSymbol,
-        string memory baseTokenSymbol
-    ) private pure returns (string memory svg) {
-        svg = string(
-            abi.encodePacked(
-                '<text text-rendering="optimizeSpeed">',
-                '<textPath startOffset="-100%" fill="white" font-family="\'Courier New\', monospace" font-size="10px" xlink:href="#text-path-a">',
-                baseToken,
-                unicode" • ",
-                baseTokenSymbol,
-                ' <animate additive="sum" attributeName="startOffset" from="0%" to="100%" begin="0s" dur="30s" repeatCount="indefinite" />',
-                '</textPath> <textPath startOffset="0%" fill="white" font-family="\'Courier New\', monospace" font-size="10px" xlink:href="#text-path-a">',
-                baseToken,
-                unicode" • ",
-                baseTokenSymbol,
-                ' <animate additive="sum" attributeName="startOffset" from="0%" to="100%" begin="0s" dur="30s" repeatCount="indefinite" /> </textPath>',
-                '<textPath startOffset="50%" fill="white" font-family="\'Courier New\', monospace" font-size="10px" xlink:href="#text-path-a">',
-                quoteToken,
-                unicode" • ",
-                quoteTokenSymbol,
-                ' <animate additive="sum" attributeName="startOffset" from="0%" to="100%" begin="0s" dur="30s"',
-                ' repeatCount="indefinite" /></textPath><textPath startOffset="-50%" fill="white" font-family="\'Courier New\', monospace" font-size="10px" xlink:href="#text-path-a">',
-                quoteToken,
-                unicode" • ",
-                quoteTokenSymbol,
-                ' <animate additive="sum" attributeName="startOffset" from="0%" to="100%" begin="0s" dur="30s" repeatCount="indefinite" /></textPath></text>'
-            )
-        );
-    }
-
-    function generateSVGCardMantle(
-        string memory quoteTokenSymbol,
-        string memory baseTokenSymbol,
-        string memory feeTier
-    ) private pure returns (string memory svg) {
-        svg = string(
-            abi.encodePacked(
-                '<g mask="url(#fade-symbol)"><rect fill="none" x="0px" y="0px" width="290px" height="200px" /> <text y="70px" x="32px" fill="white" font-family="\'Courier New\', monospace" font-weight="200" font-size="36px">',
-                quoteTokenSymbol,
-                "/",
-                baseTokenSymbol,
-                '</text><text y="115px" x="32px" fill="white" font-family="\'Courier New\', monospace" font-weight="200" font-size="36px">',
-                feeTier,
-                "</text></g>",
-                '<rect x="16" y="16" width="258" height="468" rx="26" ry="26" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.2)" />'
             )
         );
     }

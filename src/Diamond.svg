@@ -1,32 +1,44 @@
-<svg width="290" height="290" viewBox="0 0 290 290" xmlns="http://www.w3.org/2000/svg" xmlns:xlink='http://www.w3.org/1999/xlink'>
-   <defs>
-      <filter id="f1">
-         <feImage result="p0" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMjkwJyBoZWlnaHQ9JzI5MCcgdmlld0JveD0nMCAwIDI5MCAyOTAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PHJlY3Qgd2lkdGg9JzI5MHB4JyBoZWlnaHQ9JzI5MHB4JyBmaWxsPScjMWY5ODQwJy8+PC9zdmc+"/>
-         <feImage result="p1" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMjkwJyBoZWlnaHQ9JzI5MCcgdmlld0JveD0nMCAwIDI5MCAyOTAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PGNpcmNsZSBjeD0nMTcnIGN5PScyNzYnIHI9JzEyMHB4JyBmaWxsPScjYzAyYWFhJy8+PC9zdmc+"/>
-         <feImage result="p2" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMjkwJyBoZWlnaHQ9JzI5MCcgdmlld0JveD0nMCAwIDI5MCAyOTAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PGNpcmNsZSBjeD0nMjM4JyBjeT0nMTEyJyByPScxMjBweCcgZmlsbD0nIzAxZjk4NCcvPjwvc3ZnPg==" />
-         <feImage result="p3" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMjkwJyBoZWlnaHQ9JzI5MCcgdmlld0JveD0nMCAwIDI5MCAyOTAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PGNpcmNsZSBjeD0nMjA3JyBjeT0nNDUyJyByPScxMDBweCcgZmlsbD0nIzc1NmNjMicvPjwvc3ZnPg==" />
-         <feBlend mode="overlay" in="p0" in2="p1" />
-         <feBlend mode="exclusion" in2="p2" />
-         <feBlend mode="overlay" in2="p3" result="blendOut" />
-         <feGaussianBlur in="blendOut" stdDeviation="42" />
-      </filter>
-      <clipPath id="corners">
-         <rect width="290" height="290" rx="42" ry="42" />
-      </clipPath>
-      <linearGradient id="grad-symbol">
-         <stop offset="0.7" stop-color="white" stop-opacity="1" />
-         <stop offset=".95" stop-color="white" stop-opacity="0" />
-      </linearGradient>
-   </defs>
-   <g clip-path="url(#corners)">
-      <rect fill="rgba(0,0,0,1.0)" x="0px" y="0px" width="290px" height="290px" />
-      <rect style="filter: url(#f1)" x="0px" y="0px" width="290px" height="290px" />
-      <rect x="0" y="0" width="290" height="290" rx="42" ry="42" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.5)" />
-   </g>
-   <g>
-      <text y="70px" x="32px" fill="white" font-family="'Georgia', serif" font-weight="200" font-size="36px">Diamond</text>
-   </g>
-   <rect x="16" y="16" width="258" height="258" rx="26" ry="26" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.5)" />
+<svg width="300" height="500" viewBox="0 0 300 500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <clipPath id="c1">
+            <rect width="300" height="500" rx="38" ry="38" />
+        </clipPath>
+        <clipPath id="c2">
+            <rect x="16" y="16" width="268" height="468" rx="26" ry="26" />
+        </clipPath>
+        <pattern id="p1" width='20' height='40' patternUnits='userSpaceOnUse' patternTransform='scale(.5)'>
+            <path d='M0 30h20L10 50zm-10-20h20L0 30zm20 0h20L20 30zM0-10h20L10 10z' stroke-width='1' stroke='rgba(0,0,128,.1)' fill='none'/>
+        </pattern>
+        <filter id="f1">
+            <!-- <feImage result="p0" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMzAwJyBoZWlnaHQ9JzUwMCcgdmlld0JveD0nMCAwIDMwMCA1MDAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PHJlY3Qgd2lkdGg9JzI5MHB4JyBoZWlnaHQ9JzI5MHB4JyBmaWxsPScjMWY5ODQwJy8+PC9zdmc+"/> -->
+            <feImage result="p1" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMzAwJyBoZWlnaHQ9JzUwMCcgdmlld0JveD0nMCAwIDMwMCA1MDAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PGNpcmNsZSBjeD0nMTcnIGN5PScyNzYnIHI9JzEyMHB4JyBmaWxsPScjYzAyYWFhJy8+PC9zdmc+"/>
+            <feImage result="p2" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMzAwJyBoZWlnaHQ9JzUwMCcgdmlld0JveD0nMCAwIDMwMCA1MDAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PGNpcmNsZSBjeD0nMjM4JyBjeT0nMTEyJyByPScxMjBweCcgZmlsbD0nIzAxZjk4NCcvPjwvc3ZnPg==" />
+            <feImage result="p3" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMzAwJyBoZWlnaHQ9JzUwMCcgdmlld0JveD0nMCAwIDMwMCA1MDAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PGNpcmNsZSBjeD0nMjA3JyBjeT0nNDUyJyByPScxMDBweCcgZmlsbD0nIzc1NmNjMicvPjwvc3ZnPg==" />
+            <feBlend mode="overlay" in="p0" in2="p1" />
+            <feBlend mode="exclusion" in2="p2" />
+            <feBlend mode="overlay" in2="p3" result="blendOut" />
+            <feGaussianBlur in="blendOut" stdDeviation="40" />
+        </filter>
+        <filter id="f2">
+            <feGaussianBlur in="blendOut" stdDeviation="10" />
+        </filter>
+        <filter id="f3">
+            <feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.01" numOctaves="5" result="t1" />
+        </filter>
+    </defs>
+    <g clip-path="url(#c1)">
+        <rect x="0" y="0" width="300" height="500" rx="38" ry="38" fill="url(#p1)"/>
+        <rect x="0" y="0" width="300" height="500" rx="38" ry="38" fill="none" stroke="rgba(0,0,128,.25)" stroke-width="1" />
+        <rect x="16" y="16" width="268" height="468" rx="26" ry="26" fill="none" stroke="rgba(255,255,255,1)" stroke-width="4" />
+
+        <g clip-path="url(#c2)">
+            <rect x="16" y="16" width="268" height="468" rx="26" ry="26" fill="rgba(255,255,255,1)" style="filter:url(#f2)" />
+            <rect x="22" y="22" width="256" height="456" rx="26" ry="26" fill="none" style="filter:url(#f1)" stroke="rgba(0,0,128,.1)" stroke-width="1" />
+            <rect x="16" y="16" width="268" height="468" rx="26" ry="26" fill="none" style="filter: url(#f3)" />
+        </g>
+    </g>
+    <rect x="16" y="16" width="268" height="468" rx="26" ry="26" fill="none" stroke="rgba(255,255,255,1)" stroke-width="4" />
+    <rect x="16" y="16" width="268" height="468" rx="26" ry="26" fill="none" stroke="rgba(0,0,128,.5)" stroke-width="1" />
 </svg>
 
-
+<!-- Generate stars -->
