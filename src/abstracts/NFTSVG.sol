@@ -58,9 +58,11 @@ abstract contract NFTSVG {
         uint256 tokenBalance,
         uint256 totalTokenReserves
     ) internal pure returns (string memory) {
-        uint256 seedA = tokenId;
-        uint256 seedB = tokenId + 1;
-        uint256 scale = 10 + (1000 * (tokenBalance / totalTokenReserves));
+        // x^3 / x^3 + (1 - x)^3 (steep smoothstep)
+        // 0.04 -> 4% of total supply = 1
+        // 0 (0) - 75 (0.5) - 150 (1)
+        uint256 x = (tokenBalance / totalTokenReserves); // 150.000 tons
+        uint256 scale = 100 + (x**3 / x**3 + (1 - x)**3);
 
         return
             Base64.encode(
@@ -71,16 +73,17 @@ abstract contract NFTSVG {
                             "<defs>",
                             '<filter id="f1">',
                             '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.02" numOctaves="5" result="t1" seed="',
-                            seedA.toString(),
+                            tokenId.toString(),
                             '" />',
                             '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.01" numOctaves="5" result="t2" seed="',
-                            seedB.toString(),
+                            (tokenId + 1).toString(),
                             '" />',
                             '<feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="t1" in2="t2" scale="',
                             scale.toString(),
                             '" />',
                             "</filter>",
                             "</defs>",
+                            '<rect width="300" height="300" fill="rgba(239,239,239,1)" />',
                             '<rect width="300" height="300" fill="none" style="filter: url(#f1)" />',
                             '<rect width="300" height="300" rx="0" ry="0" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1" />',
                             "</svg>"

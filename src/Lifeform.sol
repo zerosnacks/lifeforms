@@ -11,6 +11,8 @@ import {ReentrancyGuard} from "solmate/utils/ReentrancyGuard.sol";
 import {ERC721} from "./abstracts/ERC721.sol";
 import {NFTSVG} from "./abstracts/NFTSVG.sol";
 
+// Plan is to release 1000 tokens for 100 MATIC each
+
 /// @title Lifeform
 /// @notice Carbon bearing NFT
 contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
@@ -19,6 +21,14 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     // ======
     // EVENTS
     // ======
+
+    /// @notice Emitted after a succesful pause.
+    /// @param user The address that paused the contract
+    event Paused(address indexed user);
+
+    /// @notice Emitted after a succesful unpause.
+    /// @param user The address that unpaused the contract
+    event Unpaused(address indexed user);
 
     /// @notice Emitted after a successful deposit.
     /// @param user The address that deposited into the NFT.
@@ -51,11 +61,30 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @notice Whether the sale is active.
     bool public isSaleActive;
 
+    /// @notice Whether the contract is paused.
+    bool public isPaused;
+
     /// @notice Maximum number of token instances that can be minted on this contract.
     uint256 public maxSupply;
 
     /// @notice Price of each minted token instance.
     uint256 public salePrice;
+
+    // =========
+    // MODIFIERS
+    // =========
+
+    /// @dev Modifier to make a function callable only when the contract is not paused.
+    modifier whenUnpaused() {
+        require(!isPaused, "MUST_BE_UNPAUSED");
+        _;
+    }
+
+    /// @dev Modifier to make a function callable only when the contract is paused.
+    modifier whenPaused() {
+        require(isPaused, "MUST_BE_PAUSED");
+        _;
+    }
 
     // ==================
     // ERC20-LIKE STORAGE
@@ -88,7 +117,9 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     // MINT LOGIC
     // ==========
 
-    function mint(address to) external payable {
+    /// @notice Mint token to address
+    /// @param to The address to mint to.
+    function mint(address to) external payable whenUnpaused {
         require(totalSupply + 1 <= maxSupply, "ALL_TOKENS_MINTED");
         require(isSaleActive, "SALE_NOT_ACTIVE");
         require(salePrice <= msg.value, "INSUFFICIENT_ETHER");
@@ -96,7 +127,11 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         _mint(to, totalSupply, tokenURI(totalSupply));
     }
 
+    /// @notice Get the token URI by token id.
+    /// @param tokenId The token id to get token URI of.
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        require(ownerOf[tokenId] != address(0), "TOKEN_MUST_EXIST");
+
         return
             generateTokenURI(
                 // tokenId
@@ -115,7 +150,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @notice Deposit a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to deposit to.
     /// @param underlyingAmount The amount of the underlying token to deposit.
-    function deposit(uint256 tokenId, uint256 underlyingAmount) external nonReentrant {
+    function deposit(uint256 tokenId, uint256 underlyingAmount) external nonReentrant whenUnpaused {
         // We don't allow depositing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
@@ -123,7 +158,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         // Transfer the provided amount of underlying tokens from msg.sender to this contract.
         UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
 
-        // Cannot underflow because a user's balance
+        // Cannot overflow because a user's balance
         // will never be larger than the total supply.
         unchecked {
             tokenBalances[tokenId] += underlyingAmount;
@@ -136,7 +171,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @notice Withdraw a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to withdraw from.
     /// @param underlyingAmount The amount of underlying tokens to withdraw.
-    function withdraw(uint256 tokenId, uint256 underlyingAmount) external nonReentrant {
+    function withdraw(uint256 tokenId, uint256 underlyingAmount) external nonReentrant whenUnpaused {
         // We don't allow withdrawing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
@@ -159,6 +194,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @param spender The proposed spender.
     /// @param tokenId The token id to withdraw from.
     function _isApprovedOrOwner(uint256 tokenId, address spender) internal view virtual returns (bool) {
+        require(ownerOf[tokenId] != address(0), "TOKEN_MUST_EXIST");
         address owner = ownerOf[tokenId];
         return (spender == owner || getApproved[tokenId] == spender || isApprovedForAll[owner][spender]);
     }
@@ -167,14 +203,26 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     // ADMINISTRATIVE LOGIC
     // ====================
 
-    /// @notice Flips sale to active or inactive.
+    /// @notice Flips to paused or unpaused.
+    function flipPause() external requiresAuth {
+        isPaused = !isPaused;
+
+        if (isPaused) {
+            emit Paused(msg.sender);
+        } else {
+            emit Unpaused(msg.sender);
+        }
+    }
+
+    /// @notice Flips to active or inactive.
     function flipSale() external requiresAuth {
         isSaleActive = !isSaleActive;
     }
 
-    /// @notice Withdraw all received funds.
-    /// @dev Caller will recevie any ETH held as float.
-    function withdraw(address to) external requiresAuth {
+    /// @notice Claim all received funds.
+    /// @dev Caller will receive any ETH held as float.
+    /// @param to Address to send ETH to.
+    function claim(address to) external requiresAuth {
         payable(to).transfer(address(this).balance);
     }
 
@@ -184,13 +232,13 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
 
     /// @notice Rescues arbitrary ERC20 tokens send to the contract by sending them to the contract owner.
     /// @dev Caller will receive any ERC20 token held as float.
-    function rescue(ERC20 token, uint256 tokenAmount) external requiresAuth {
+    /// @param token Address of ERC20 token to rescue.
+    /// @param tokenAmount Amount of ERC20 token to rescue.
+    function rescue(ERC20 token, uint256 tokenAmount) external requiresAuth whenPaused {
         // We don't allow depositing 0 to prevent emitting a useless event.
         require(tokenAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
 
-        // Prevent authorized user from seizing underlying asset.
-        require(token != UNDERLYING, "NOT_PERMITTED");
-
+        ERC20(token).approve(msg.sender, tokenAmount); // TODO: verify if the approve is actually necessary
         ERC20(token).safeTransfer(msg.sender, tokenAmount);
 
         emit Rescue(address(token), tokenAmount);
@@ -198,7 +246,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
 
     /// @notice Self destructs, enabling it to be redeployed.
     /// @dev Caller will receive any ETH held as float.
-    function destroy() external requiresAuth {
+    function destroy() external requiresAuth whenPaused {
         selfdestruct(payable(msg.sender));
     }
 
