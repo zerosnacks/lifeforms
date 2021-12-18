@@ -1,0 +1,12 @@
+<!-- pass in seed and scale -->
+<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <filter id="f1">
+            <feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.02" numOctaves="5" result="t1" seed="1"/>
+            <feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.01" numOctaves="5" result="t2" seed="1" />
+            <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="t1" in2="t2" scale="1000" />
+        </filter>
+    </defs>
+    <rect width="300" height="300" fill="none" style="filter: url(#f1)" />
+    <rect width="300" height="300" rx="0" ry="0" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1" />
+</svg>

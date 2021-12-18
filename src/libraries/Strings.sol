@@ -4,9 +4,7 @@ pragma solidity >=0.8.0;
 /// @title Strings
 /// @author Modified from OpenZeppelin (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Strings.sol)
 library Strings {
-    /**
-     * @dev Converts a `uint256` to its ASCII `string` representation.
-     */
+    /// @dev Converts a `uint256` to its ASCII `string` representation.
     function toString(uint256 value) internal pure returns (string memory) {
         // Inspired by OraclizeAPI's implementation - MIT licence
         // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol

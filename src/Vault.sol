@@ -60,6 +60,8 @@ contract Vault is ERC20, Auth {
     // CONSTRUCTOR
     // ===========
 
+    /// @notice Create the vault based around the underlying token.
+    /// @param _underlying The underlying ERC20 token.
     constructor(ERC20 _underlying)
         ERC20(
             // ex: ZS Dai Stablecoin Vault

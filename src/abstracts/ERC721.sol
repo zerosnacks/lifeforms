@@ -32,11 +32,11 @@ abstract contract ERC721 {
 
     mapping(uint256 => address) public ownerOf;
 
-    mapping(uint256 => string) public tokenURI;
-
     mapping(uint256 => address) public getApproved;
 
     mapping(address => mapping(address => bool)) public isApprovedForAll;
+
+    mapping(uint256 => string) private tokenURIs;
 
     // ===========
     // CONSTRUCTOR
@@ -58,6 +58,10 @@ abstract contract ERC721 {
     // =============
     // ERC-721 LOGIC
     // =============
+
+    function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
+        return tokenURIs[tokenId];
+    }
 
     function approve(address spender, uint256 tokenId) public virtual {
         address owner = ownerOf[tokenId];
@@ -153,7 +157,7 @@ abstract contract ERC721 {
 
         ownerOf[tokenId] = to;
 
-        tokenURI[tokenId] = tokenURI_;
+        tokenURIs[tokenId] = tokenURI_;
 
         emit Transfer(address(0), to, tokenId);
     }
