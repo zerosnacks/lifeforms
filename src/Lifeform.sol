@@ -32,6 +32,11 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @param underlyingAmount The amount of underlying tokens that were withdrawn.
     event Withdraw(address indexed user, uint256 tokenId, uint256 underlyingAmount);
 
+    /// @notice Emitted after a succesful rescue.
+    /// @param token The token who needs to be rescued.
+    /// @param amount The amount of token that were deposited that need to be rescued.
+    event Rescue(address token, uint256 amount);
+
     // =========
     // CONSTANTS
     // =========
@@ -176,6 +181,20 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     // =================
     // DESTRUCTION LOGIC
     // =================
+
+    /// @notice Rescues arbitrary ERC20 tokens send to the contract by sending them to the contract owner.
+    /// @dev Caller will receive any ERC20 token held as float.
+    function rescue(ERC20 token, uint256 tokenAmount) external requiresAuth {
+        // We don't allow depositing 0 to prevent emitting a useless event.
+        require(tokenAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
+
+        // Prevent authorized user from seizing underlying asset.
+        require(token != UNDERLYING, "NOT_PERMITTED");
+
+        ERC20(token).safeTransfer(msg.sender, tokenAmount);
+
+        emit Rescue(address(token), tokenAmount);
+    }
 
     /// @notice Self destructs, enabling it to be redeployed.
     /// @dev Caller will receive any ETH held as float.
