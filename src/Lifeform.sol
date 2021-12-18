@@ -206,6 +206,6 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     // RECIEVE ETHER LOGIC
     // ===================
 
-    /// @dev Required for the Vault to receive unwrapped ETH.
+    /// @dev Required for the contract to receive unwrapped ETH.
     receive() external payable {}
 }
