@@ -39,6 +39,10 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @notice The underlying token the NFT accepts.
     ERC20 public immutable UNDERLYING;
 
+    /// @notice The base unit of the underlying token.
+    /// @dev Equal to 10 ** decimals. Used for fixed point arithmetic.
+    uint256 public immutable BASE_UNIT;
+
     /// @notice Whether the sale is active.
     bool public isSaleActive;
 
@@ -72,6 +76,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         maxSupply = _maxSupply;
         salePrice = _salePrice;
         UNDERLYING = _underlying;
+        BASE_UNIT = 10**UNDERLYING.decimals();
     }
 
     // ==========
@@ -92,9 +97,9 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
                 // tokenId
                 tokenId,
                 // tokenBalance
-                tokenBalances[tokenId],
+                tokenBalances[tokenId] / BASE_UNIT,
                 // totalReserves
-                tokenTotalReserves
+                tokenTotalReserves / BASE_UNIT
             );
     }
 

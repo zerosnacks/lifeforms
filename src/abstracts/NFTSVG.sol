@@ -16,7 +16,7 @@ abstract contract NFTSVG {
         uint256 tokenBalance,
         uint256 totalTokenReserves
     ) public pure returns (string memory) {
-        string memory name = _generateDescription(tokenId);
+        string memory name = _generateName(tokenId);
         string memory description = _generateDescription(tokenBalance);
         string memory image = _generateImage(tokenId, tokenBalance, totalTokenReserves);
 
@@ -49,11 +49,7 @@ abstract contract NFTSVG {
     function _generateDescription(uint256 tokenBalance) internal pure returns (string memory) {
         return
             string(
-                abi.encodePacked(
-                    "Carbon bearing asset storing ",
-                    tokenBalance.toString(), // TODO: format correctly by dividing by 10**18
-                    " Base Carbon Tonne tokens."
-                )
+                abi.encodePacked("Carbon bearing asset storing ", tokenBalance.toString(), " Base Carbon Tonne tokens.")
             );
     }
 
@@ -64,7 +60,7 @@ abstract contract NFTSVG {
     ) internal pure returns (string memory) {
         uint256 seedA = tokenId;
         uint256 seedB = tokenId + 1;
-        uint256 scale = 10 + (10 * tokenBalance) / totalTokenReserves;
+        uint256 scale = 10 + (1000 * (tokenBalance / totalTokenReserves));
 
         return
             Base64.encode(
