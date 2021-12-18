@@ -9,19 +9,21 @@ import {ERC20} from "solmate/tokens/ERC20.sol";
 import {Lifeform} from "../Lifeform.sol";
 
 contract LifeformsTest is DSTestPlus {
-    Lifeform diamond;
+    Lifeform lifeform;
 
     function setUp() public {
-        diamond = new Lifeform("Lifeform", "LIFE", 1000, 10, ERC20(address(0)));
+        lifeform = new Lifeform("Lifeform", "LIFE", 1000, 10, ERC20(address(0)));
     }
 
-    // =================
-    // MINT / BURN TESTS
-    // =================
+    // ==========
+    // MINT TESTS
+    // ==========
 
     function testAtomicMint() public {
-        uint256 preDepositBal = diamond.balanceOf(address(this));
+        uint256 preDepositBal = lifeform.balanceOf(address(this));
 
-        diamond.mint(address(this));
+        lifeform.mint(address(this));
+
+        assertEq(lifeform.balanceOf(address(this)), preDepositBal + 1);
     }
 }

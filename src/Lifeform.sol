@@ -57,9 +57,9 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @notice Price of each minted token instance.
     uint256 public salePrice;
 
-    // =============
+    // ==================
     // ERC20-LIKE STORAGE
-    // =============
+    // ==================
 
     uint256 public tokenTotalReserves;
 
