@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.8.0;
 
-/// @notice Modern and gas efficient ERC-721 + ERC-20/EIP-2612-like implementation (non-compliant).
+/// @notice Modern and gas efficient ERC-721 implementation.
 /// @author Modified from LexDAO (https://github.com/lexDAO/Kali/blob/main/contracts/tokens/erc721/ERC721.sol)
 abstract contract ERC721 {
     // ======
