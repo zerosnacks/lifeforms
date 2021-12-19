@@ -22,13 +22,13 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     // EVENTS
     // ======
 
-    /// @notice Emitted after a succesful pause.
+    /// @notice Emitted after a succesful pause state switch.
     /// @param user The address that paused the contract
-    event Paused(address indexed user);
+    event Paused(address indexed user, bool isPaused);
 
-    /// @notice Emitted after a succesful unpause.
-    /// @param user The address that unpaused the contract
-    event Unpaused(address indexed user);
+    /// @notice Emitted after a succesful sale state switch.
+    /// @param user The address that paused the contract
+    event SaleActive(address indexed user, bool isSale);
 
     /// @notice Emitted after a successful deposit.
     /// @param user The address that deposited into the NFT.
@@ -77,12 +77,6 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @dev Modifier to make a function callable only when the contract is not paused.
     modifier whenUnpaused() {
         require(!isPaused, "MUST_BE_UNPAUSED");
-        _;
-    }
-
-    /// @dev Modifier to make a function callable only when the contract is paused.
-    modifier whenPaused() {
-        require(isPaused, "MUST_BE_PAUSED");
         _;
     }
 
@@ -208,16 +202,14 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     function flipPause() external requiresAuth {
         isPaused = !isPaused;
 
-        if (isPaused) {
-            emit Paused(msg.sender);
-        } else {
-            emit Unpaused(msg.sender);
-        }
+        emit Paused(msg.sender, isPaused);
     }
 
     /// @notice Flips to active or inactive.
     function flipSale() external requiresAuth {
         isSaleActive = !isSaleActive;
+
+        emit SaleActive(msg.sender, isSaleActive);
     }
 
     /// @notice Claim all received funds.
@@ -235,7 +227,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @dev Caller will receive any ERC20 token held as float.
     /// @param token Address of ERC20 token to rescue.
     /// @param tokenAmount Amount of ERC20 token to rescue.
-    function rescue(ERC20 token, uint256 tokenAmount) external requiresAuth whenPaused {
+    function rescue(ERC20 token, uint256 tokenAmount) external requiresAuth {
         // We don't allow depositing 0 to prevent emitting a useless event.
         require(tokenAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
 
@@ -247,7 +239,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
 
     /// @notice Self destructs, enabling it to be redeployed.
     /// @dev Caller will receive any ETH held as float.
-    function destroy() external requiresAuth whenPaused {
+    function destroy() external requiresAuth {
         selfdestruct(payable(msg.sender));
     }
 
