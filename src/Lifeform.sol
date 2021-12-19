@@ -40,10 +40,15 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @param underlyingAmount The amount of underlying tokens that were withdrawn.
     event TokenWithdraw(address indexed user, uint256 tokenId, uint256 underlyingAmount);
 
+    /// @notice Emitted after token total reserve update.
+    /// @param user The address that updated the token total reserve cap.
+    /// @param underlyingAmount The amount of underlying tokens that are allowed to be deposited.
+    event TokenTotalReserveCapUpdate(address indexed user, uint256 underlyingAmount);
+
     /// @notice Emitted after a succesful rescue.
-    /// @param token The token who needs to be rescued.
-    /// @param amount The amount of token that were deposited that need to be rescued.
-    event Rescue(address token, uint256 amount);
+    /// @param user The address that rescued the ERC20 token.
+    /// @param token The ERC20 token that was rescued.
+    event Rescue(address indexed user, address token);
 
     // =========
     // CONSTANTS
@@ -83,10 +88,10 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     // ==================
 
     /// @notice Tracks the total amount of underlying tokens deposited.
-    uint256 public tokenTotalReserves;
+    uint256 public tokenTotalReserve;
 
     /// @notice Caps the amount of underlying tokens that are allowed to be deposited.
-    uint256 public tokenTotalReservesCap;
+    uint256 public tokenTotalReserveCap;
 
     /// @notice Mapping of underlying token balances.
     mapping(uint256 => uint256) public tokenBalances;
@@ -103,14 +108,14 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         string memory _symbol,
         uint256 _maxSupply,
         uint256 _salePrice,
-        uint256 _tokenTotalReservesCap,
+        uint256 _tokenTotalReserveCap,
         ERC20 _underlying
     ) ERC721(_name, _symbol) Auth(Auth(msg.sender).owner(), Auth(msg.sender).authority()) {
         maxSupply = _maxSupply;
         salePrice = _salePrice;
         UNDERLYING = _underlying;
         BASE_UNIT = 10**UNDERLYING.decimals();
-        tokenTotalReservesCap = _tokenTotalReservesCap * BASE_UNIT;
+        tokenTotalReserveCap = _tokenTotalReserveCap * BASE_UNIT;
     }
 
     // ==========
@@ -133,7 +138,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(ownerOf[tokenId] != address(0), "TOKEN_MUST_EXIST");
 
-        return generateTokenURI(tokenId, tokenBalances[tokenId] / BASE_UNIT, tokenTotalReserves / BASE_UNIT);
+        return generateTokenURI(tokenId, tokenBalances[tokenId] / BASE_UNIT, tokenTotalReserve / BASE_UNIT);
     }
 
     // ================
@@ -153,7 +158,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         // We don't allow depositing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
-        require(tokenTotalReserves + underlyingAmount <= tokenTotalReservesCap, "TOKEN_RESERVE_IS_CAPPED");
+        require(tokenTotalReserve + underlyingAmount <= tokenTotalReserveCap, "TOKEN_RESERVE_IS_CAPPED");
 
         // Transfer the provided amount of underlying tokens from msg.sender to this contract.
         UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
@@ -162,7 +167,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         // will never be larger than the total supply.
         unchecked {
             tokenBalances[tokenId] += underlyingAmount;
-            tokenTotalReserves += underlyingAmount;
+            tokenTotalReserve += underlyingAmount;
         }
 
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
@@ -184,7 +189,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         // will never be larger than the total supply.
         unchecked {
             tokenBalances[tokenId] -= underlyingAmount;
-            tokenTotalReserves -= underlyingAmount;
+            tokenTotalReserve -= underlyingAmount;
         }
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
@@ -203,6 +208,14 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     // ====================
     // ADMINISTRATIVE LOGIC
     // ====================
+
+    /// @notice Sets the token reserve cap.
+    /// @param _tokenTotalReserveCap The token amount allowed to be deposited in the contract.
+    function setTokenReserveCap(uint256 _tokenTotalReserveCap) external requiresAuth {
+        tokenTotalReserveCap = _tokenTotalReserveCap * BASE_UNIT;
+
+        emit TokenTotalReserveCapUpdate(msg.sender, tokenTotalReserveCap);
+    }
 
     /// @notice Flips to paused or unpaused.
     function flipPause() external requiresAuth {
@@ -232,15 +245,10 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @notice Rescues arbitrary ERC20 tokens send to the contract by sending them to the contract owner.
     /// @dev Caller will receive any ERC20 token held as float.
     /// @param token Address of ERC20 token to rescue.
-    /// @param tokenAmount Amount of ERC20 token to rescue.
-    function rescue(ERC20 token, uint256 tokenAmount) external requiresAuth {
-        // We don't allow depositing 0 to prevent emitting a useless event.
-        require(tokenAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
+    function rescue(ERC20 token) external requiresAuth {
+        ERC20(token).safeTransfer(msg.sender, ERC20(token).balanceOf(address(this)));
 
-        ERC20(token).approve(msg.sender, tokenAmount); // TODO: verify if the approve is actually necessary
-        ERC20(token).safeTransfer(msg.sender, tokenAmount);
-
-        emit Rescue(address(token), tokenAmount);
+        emit Rescue(msg.sender, address(token));
     }
 
     // TODO: remove before launch !!
