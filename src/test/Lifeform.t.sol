@@ -12,7 +12,7 @@ contract LifeformsTest is DSTestPlus {
     Lifeform lifeform;
 
     function setUp() public {
-        lifeform = new Lifeform("Lifeform", "LIFE", 1000, 10, ERC20(address(0)));
+        lifeform = new Lifeform("Lifeform", "LIFE", 1000, 10, 10000, ERC20(address(0)));
     }
 
     // ==========

@@ -11,8 +11,6 @@ import {ReentrancyGuard} from "solmate/utils/ReentrancyGuard.sol";
 import {ERC721} from "./abstracts/ERC721.sol";
 import {NFTSVG} from "./abstracts/NFTSVG.sol";
 
-// Plan is to release 1000 tokens for 100 MATIC each
-
 /// @title Lifeform
 /// @notice Carbon bearing NFT
 contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
@@ -34,13 +32,13 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @param user The address that deposited into the NFT.
     /// @param tokenId The token id the user deposited to.
     /// @param underlyingAmount The amount of underlying tokens that were deposited.
-    event Deposit(address indexed user, uint256 tokenId, uint256 underlyingAmount);
+    event TokenDeposit(address indexed user, uint256 tokenId, uint256 underlyingAmount);
 
     /// @notice Emitted after a successful withdrawal.
     /// @param user The address that withdrew from the NFT.
     /// @param tokenId The token id the user withdrew from.
     /// @param underlyingAmount The amount of underlying tokens that were withdrawn.
-    event Withdraw(address indexed user, uint256 tokenId, uint256 underlyingAmount);
+    event TokenWithdraw(address indexed user, uint256 tokenId, uint256 underlyingAmount);
 
     /// @notice Emitted after a succesful rescue.
     /// @param token The token who needs to be rescued.
@@ -84,10 +82,16 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     // ERC20-LIKE STORAGE
     // ==================
 
+    /// @notice Tracks the total amount of underlying tokens deposited.
     uint256 public tokenTotalReserves;
 
+    /// @notice Caps the amount of underlying tokens that are allowed to be deposited.
+    uint256 public tokenTotalReservesCap;
+
+    /// @notice Mapping of underlying token balances.
     mapping(uint256 => uint256) public tokenBalances;
 
+    /// @notice Mapping of underlying token allowances. // TODO: WHERE IS THIS USED?
     mapping(uint256 => mapping(uint256 => uint256)) public tokenAllowances;
 
     // ===========
@@ -99,12 +103,14 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         string memory _symbol,
         uint256 _maxSupply,
         uint256 _salePrice,
+        uint256 _tokenTotalReservesCap,
         ERC20 _underlying
     ) ERC721(_name, _symbol) Auth(Auth(msg.sender).owner(), Auth(msg.sender).authority()) {
         maxSupply = _maxSupply;
         salePrice = _salePrice;
         UNDERLYING = _underlying;
         BASE_UNIT = 10**UNDERLYING.decimals();
+        tokenTotalReservesCap = _tokenTotalReservesCap * BASE_UNIT;
     }
 
     // ==========
@@ -130,17 +136,24 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         return generateTokenURI(tokenId, tokenBalances[tokenId] / BASE_UNIT, tokenTotalReserves / BASE_UNIT);
     }
 
-    // ========================
-    // DEPOSIT / WITHDRAW LOGIC
-    // ========================
+    // ================
+    // ERC20-LIKE LOGIC
+    // ================
+
+    /// @notice Approve this contract for moving underlying tokens
+    /// @param underlyingAmount The amount of underlying tokens to approve.
+    function approveToken(uint256 underlyingAmount) external whenUnpaused {
+        UNDERLYING.approve(address(this), underlyingAmount);
+    }
 
     /// @notice Deposit a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to deposit to.
-    /// @param underlyingAmount The amount of the underlying token to deposit.
-    function deposit(uint256 tokenId, uint256 underlyingAmount) external nonReentrant whenUnpaused {
+    /// @param underlyingAmount The amount of the underlying tokens to deposit.
+    function depositToken(uint256 tokenId, uint256 underlyingAmount) external nonReentrant whenUnpaused {
         // We don't allow depositing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
+        require(tokenTotalReserves + underlyingAmount <= tokenTotalReservesCap, "TOKEN_RESERVE_IS_CAPPED");
 
         // Transfer the provided amount of underlying tokens from msg.sender to this contract.
         UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
@@ -152,13 +165,13 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
             tokenTotalReserves += underlyingAmount;
         }
 
-        emit Deposit(msg.sender, tokenId, underlyingAmount);
+        emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
     }
 
     /// @notice Withdraw a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to withdraw from.
     /// @param underlyingAmount The amount of underlying tokens to withdraw.
-    function withdraw(uint256 tokenId, uint256 underlyingAmount) external nonReentrant whenUnpaused {
+    function withdrawToken(uint256 tokenId, uint256 underlyingAmount) external nonReentrant whenUnpaused {
         // We don't allow withdrawing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
@@ -174,7 +187,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
             tokenTotalReserves -= underlyingAmount;
         }
 
-        emit Withdraw(msg.sender, tokenId, underlyingAmount);
+        emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
     }
 
     /// @notice Check if spender owns the token or is approved to interact with the token.

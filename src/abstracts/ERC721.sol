@@ -57,8 +57,8 @@ abstract contract ERC721 {
     // ERC-721 LOGIC
     // =============
 
-    function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
-        return tokenId;
+    function tokenURI(uint256) public view virtual returns (string memory) {
+        return "";
     }
 
     function approve(address spender, uint256 tokenId) public virtual {
