@@ -1,0 +1,99 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lifeform</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #artboard {
+        margin-left: 25px;
+        margin-top: 25px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="artboard" width="600" height="600"></canvas>
+
+    <svg
+      id="svg"
+      style="display: none"
+      width="600"
+      height="600"
+      viewBox="0 0 600 600"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+    >
+      <defs>
+        <clipPath xmlns="http://www.w3.org/2000/svg" id="c1">
+          <rect width="600" height="600" rx="38" ry="38" />
+        </clipPath>
+        <filter id="f1">
+          <feTurbulence
+            in="SourceGraphic"
+            type="fractalNoise"
+            baseFrequency="0.02"
+            numOctaves="5"
+            result="t1"
+            seed="5"
+          />
+          <feTurbulence
+            in="SourceGraphic"
+            type="fractalNoise"
+            baseFrequency="0.005"
+            numOctaves="5"
+            result="t2"
+            seed="99"
+          />
+          <feDisplacementMap
+            xChannelSelector="R"
+            yChannelSelector="G"
+            in1="t1"
+            in2="t2"
+            scale="1500"
+          />
+        </filter>
+      </defs>
+      <g clip-path="url(#c1)">
+        <rect width="600" height="600" fill="rgba(239,239,239,1.0)" />
+        <rect width="600" height="600" fill="none" style="filter: url(#f1)" />
+        <rect
+          width="600"
+          height="600"
+          rx="38"
+          ry="38"
+          fill="none"
+          stroke="rgba(0,0,0,.25)"
+          stroke-width="1"
+        />
+      </g>
+    </svg>
+
+    <script>
+      const ctx = document.getElementById("artboard").getContext("2d");
+
+      const img = new Image();
+
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+      };
+
+      img.setAttribute(
+        "src",
+        "data:image/svg+xml;base64," +
+          btoa(
+            unescape(
+              encodeURIComponent(
+                new XMLSerializer().serializeToString(document.getElementById("svg"))
+              )
+            )
+          )
+      );
+    </script>
+  </body>
+</html>

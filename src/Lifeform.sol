@@ -119,7 +119,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         require(isSaleActive, "SALE_NOT_ACTIVE");
         require(salePrice <= msg.value, "INSUFFICIENT_ETHER");
 
-        _mint(to, totalSupply, tokenURI(totalSupply));
+        _mint(to, totalSupply);
     }
 
     /// @notice Get the token URI by token id.
@@ -127,15 +127,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(ownerOf[tokenId] != address(0), "TOKEN_MUST_EXIST");
 
-        return
-            generateTokenURI(
-                // tokenId
-                tokenId,
-                // tokenBalance
-                tokenBalances[tokenId] / BASE_UNIT,
-                // totalReserves
-                tokenTotalReserves / BASE_UNIT
-            );
+        return generateTokenURI(tokenId, tokenBalances[tokenId] / BASE_UNIT, tokenTotalReserves / BASE_UNIT);
     }
 
     // ========================
@@ -191,6 +183,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     function _isApprovedOrOwner(uint256 tokenId, address spender) internal view virtual returns (bool) {
         require(ownerOf[tokenId] != address(0), "TOKEN_MUST_EXIST");
         address owner = ownerOf[tokenId];
+
         return (spender == owner || getApproved[tokenId] == spender || isApprovedForAll[owner][spender]);
     }
 
@@ -237,6 +230,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         emit Rescue(address(token), tokenAmount);
     }
 
+    // TODO: remove before launch !!
     /// @notice Self destructs, enabling it to be redeployed.
     /// @dev Caller will receive any ETH held as float.
     function destroy() external requiresAuth {
