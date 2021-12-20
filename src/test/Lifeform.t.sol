@@ -14,16 +14,4 @@ contract LifeformsTest is DSTestPlus {
     function setUp() public {
         lifeform = new Lifeform("Lifeform", "LIFE", 1000, 10, 10000, ERC20(address(0)));
     }
-
-    // ==========
-    // MINT TESTS
-    // ==========
-
-    function testAtomicMint() public {
-        uint256 preDepositBal = lifeform.balanceOf(address(this));
-
-        lifeform.mint(address(this));
-
-        assertEq(lifeform.balanceOf(address(this)), preDepositBal + 1);
-    }
 }
