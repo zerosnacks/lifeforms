@@ -2,10 +2,10 @@
 pragma solidity >=0.8.0;
 
 // Vendor
-import {Auth} from "./vendor/solmate/auth/Auth.sol";
-import {ERC20} from "./vendor/solmate/tokens/ERC20.sol";
-import {SafeTransferLib} from "./vendor/solmate/utils/SafeTransferLib.sol";
-import {ReentrancyGuard} from "./vendor/solmate/utils/ReentrancyGuard.sol";
+import {Auth} from "solmate/auth/Auth.sol";
+import {ERC20} from "solmate/tokens/ERC20.sol";
+import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
+import {ReentrancyGuard} from "solmate/utils/ReentrancyGuard.sol";
 
 // Abstracts
 import {ERC721} from "./abstracts/ERC721.sol";

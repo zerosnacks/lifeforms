@@ -2,9 +2,9 @@
 pragma solidity >=0.8.0;
 
 // Vendor
-import {ERC20} from "./vendor/solmate/tokens/ERC20.sol";
-import {Auth, Authority} from "./vendor/solmate/auth/Auth.sol";
-import {Bytes32AddressLib} from "./vendor/solmate/utils/Bytes32AddressLib.sol";
+import {ERC20} from "solmate/tokens/ERC20.sol";
+import {Auth, Authority} from "solmate/auth/Auth.sol";
+import {Bytes32AddressLib} from "solmate/utils/Bytes32AddressLib.sol";
 
 // Contracts
 import {Vault} from "./Vault.sol";

@@ -2,9 +2,9 @@
 pragma solidity >=0.8.0;
 
 // Vendor
-import {Authority} from "../vendor/solmate/auth/Auth.sol";
-import {DSTestPlus} from "../vendor/solmate/test/utils/DSTestPlus.sol";
-import {MockERC20} from "../vendor/solmate/test/utils/mocks/MockERC20.sol";
+import {Authority} from "solmate/auth/Auth.sol";
+import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
+import {MockERC20} from "solmate/test/utils/mocks/MockERC20.sol";
 
 // Contracts
 import {Vault} from "../Vault.sol";

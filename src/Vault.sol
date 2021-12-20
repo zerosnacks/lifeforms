@@ -2,10 +2,10 @@
 pragma solidity >=0.8.0;
 
 // Vendor
-import {Auth} from "./vendor/solmate/auth/Auth.sol";
-import {ERC20} from "./vendor/solmate/tokens/ERC20.sol";
-import {SafeTransferLib} from "./vendor/solmate/utils/SafeTransferLib.sol";
-import {FixedPointMathLib} from "./vendor/solmate/utils/FixedPointMathLib.sol";
+import {Auth} from "solmate/auth/Auth.sol";
+import {ERC20} from "solmate/tokens/ERC20.sol";
+import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
+import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 
 /// @title Vault
 /// @author Inherits from Rari Capital (https://github.com/Rari-Capital/vaults/blob/main/src/Vault.sol)
