@@ -130,7 +130,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         require(isSaleActive, "SALE_NOT_ACTIVE");
         require(salePrice <= msg.value, "INSUFFICIENT_ETHER");
 
-        _mint(to, totalSupply);
+        _mint(to, totalSupply, "");
     }
 
     /// @notice Get the token URI by token id.
