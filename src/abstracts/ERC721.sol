@@ -133,9 +133,9 @@ abstract contract ERC721 {
         }
     }
 
-    // ==========
-    // MINT LOGIC
-    // ==========
+    // ==============
+    // INTERNAL LOGIC
+    // ==============
 
     function _mint(address to, uint256 tokenId) internal virtual {
         require(ownerOf[tokenId] == address(0), "ALREADY_MINTED");
