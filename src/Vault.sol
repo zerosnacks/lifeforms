@@ -15,7 +15,8 @@ contract Vault is ERC20, Auth {
 
     // Users are able to claim NFTs based on a merkle tree distribution after a certain amount of time
     // The longer and more you hold inside of the vault the higher the quality of NFT you get (and rarer)
-    // You can cause natural events to happen at certain rates, this will then randomly selected you + some other depositors with a role
+    // You can cause natural events to happen at certain rates
+    // this will then randomly selected you + some other depositors with a role
     // How can diamonds be generated
 
     // ======
