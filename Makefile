@@ -1,7 +1,13 @@
-all: build
+.PHONY: clean build test gas
 
-build:; forge build
+clean:
+	forge clean
 
-test:; forge test
+build:
+	forge build
 
-gas:; forge snapshot
+test:
+	forge test
+
+gas:
+	forge snapshot
