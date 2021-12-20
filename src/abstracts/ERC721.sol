@@ -36,6 +36,8 @@ abstract contract ERC721 {
 
     mapping(address => mapping(address => bool)) public isApprovedForAll;
 
+    mapping(uint256 => string) private tokenURIs;
+
     // ===========
     // CONSTRUCTOR
     // ===========
@@ -57,8 +59,8 @@ abstract contract ERC721 {
     // ERC-721 LOGIC
     // =============
 
-    function tokenURI(uint256) public view virtual returns (string memory) {
-        return "";
+    function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
+        return tokenURIs[tokenId];
     }
 
     function approve(address spender, uint256 tokenId) public virtual {
@@ -137,7 +139,11 @@ abstract contract ERC721 {
     // INTERNAL LOGIC
     // ==============
 
-    function _mint(address to, uint256 tokenId) internal virtual {
+    function _mint(
+        address to,
+        uint256 tokenId,
+        string memory tokenURI_
+    ) internal virtual {
         require(ownerOf[tokenId] == address(0), "ALREADY_MINTED");
 
         // this is reasonably safe from overflow because incrementing `totalSupply` beyond
@@ -150,6 +156,8 @@ abstract contract ERC721 {
         }
 
         ownerOf[tokenId] = to;
+
+        tokenURIs[tokenId] = tokenURI_;
 
         emit Transfer(address(0), to, tokenId);
     }
