@@ -3,23 +3,22 @@ pragma solidity >=0.8.0;
 
 // Libraries
 import {Base64} from "../libraries/Base64.sol";
-import {Strings} from "../libraries/Strings.sol";
+
+// import {Strings} from "../libraries/Strings.sol";
 
 /// @title NFTSVG
 /// @notice Provides a function for generating an SVG
 /// @author Modified from Uniswap V3 (https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/NFTSVG.sol)
 abstract contract NFTSVG {
-    using Strings for uint256;
+    // using Strings for uint256;
 
-    function generateTokenURI(
-        uint256 tokenId,
-        uint256 tokenBalance,
-        uint256 totalTokenReserves
-    ) public pure returns (string memory) {
-        string memory name = _generateName(tokenId);
-        string memory description = _generateDescription(tokenBalance);
-        string memory image = _generateImage(tokenId, tokenBalance, totalTokenReserves);
+    struct SVGParams {
+        uint256 tokenId;
+        uint256 tokenBalance;
+        uint256 totalTokenReserves;
+    }
 
+    function generateTokenURI(SVGParams memory params) public pure returns (string memory) {
         return
             string(
                 abi.encodePacked(
@@ -28,12 +27,12 @@ abstract contract NFTSVG {
                         bytes(
                             abi.encodePacked(
                                 '{"name":"',
-                                name,
+                                _generateName(params),
                                 '", "description":"',
-                                description,
+                                _generateDescription(params),
                                 '", "image": "',
                                 "data:image/svg+xml;base64,",
-                                image,
+                                _generateImage(params),
                                 '"}'
                             )
                         )
@@ -42,26 +41,22 @@ abstract contract NFTSVG {
             );
     }
 
-    function _generateName(uint256 tokenId) internal pure returns (string memory) {
-        return string(abi.encodePacked("Carbon - ", tokenId.toString()));
+    function _generateName(SVGParams memory params) internal pure returns (string memory) {
+        return string(abi.encodePacked("Carbon - ", params.tokenId));
     }
 
-    function _generateDescription(uint256 tokenBalance) internal pure returns (string memory) {
+    function _generateDescription(SVGParams memory params) internal pure returns (string memory) {
         return
             string(
-                abi.encodePacked("Carbon bearing asset storing ", tokenBalance.toString(), " Base Carbon Tonne tokens.")
+                abi.encodePacked("Carbon bearing asset storing ", params.tokenBalance, " Base Carbon Tonne tokens.")
             );
     }
 
-    function _generateImage(
-        uint256 tokenId,
-        uint256 tokenBalance,
-        uint256 totalTokenReserves
-    ) internal pure returns (string memory) {
+    function _generateImage(SVGParams memory params) internal pure returns (string memory) {
         // x^3 / x^3 + (1 - x)^3 (steep smoothstep)
         // 0.04 -> 4% of total supply = 1
         // 0 (0) - 75 (0.5) - 150 (1)
-        uint256 x = (tokenBalance / totalTokenReserves); // 150.000 tons
+        uint256 x = params.tokenBalance; // 150.000 tons
         uint256 scale = 100 + (x**3 / x**3 + (1 - x)**3);
 
         return
@@ -73,13 +68,13 @@ abstract contract NFTSVG {
                             "<defs>",
                             '<filter id="f1">',
                             '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.02" numOctaves="5" result="t1" seed="',
-                            tokenId.toString(),
+                            params.tokenId,
                             '" />',
                             '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.01" numOctaves="5" result="t2" seed="',
-                            (tokenId + 1).toString(),
+                            params.tokenId,
                             '" />',
                             '<feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="t1" in2="t2" scale="',
-                            scale.toString(),
+                            scale,
                             '" />',
                             "</filter>",
                             "</defs>",

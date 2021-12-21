@@ -96,9 +96,6 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @notice Mapping of underlying token balances.
     mapping(uint256 => uint256) public tokenBalances;
 
-    /// @notice Mapping of underlying token allowances. // TODO: WHERE IS THIS USED?
-    mapping(uint256 => mapping(uint256 => uint256)) public tokenAllowances;
-
     // ===========
     // CONSTRUCTOR
     // ===========
@@ -114,8 +111,8 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         maxSupply = _maxSupply;
         salePrice = _salePrice;
         UNDERLYING = _underlying;
-        BASE_UNIT = 10**UNDERLYING.decimals();
-        tokenTotalReserveCap = _tokenTotalReserveCap * BASE_UNIT;
+        BASE_UNIT = 10**_underlying.decimals();
+        tokenTotalReserveCap = _tokenTotalReserveCap;
     }
 
     // ==========
@@ -138,7 +135,13 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(ownerOf[tokenId] != address(0), "TOKEN_MUST_EXIST");
 
-        return generateTokenURI(tokenId, tokenBalances[tokenId] / BASE_UNIT, tokenTotalReserve / BASE_UNIT);
+        NFTSVG.SVGParams memory svgParams = NFTSVG.SVGParams({
+            tokenId: tokenId,
+            tokenBalance: tokenBalances[tokenId] / BASE_UNIT,
+            totalTokenReserves: tokenTotalReserve / BASE_UNIT
+        });
+
+        return generateTokenURI(svgParams);
     }
 
     // ================
@@ -212,7 +215,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @notice Sets the token reserve cap.
     /// @param _tokenTotalReserveCap The token amount allowed to be deposited in the contract.
     function setTokenReserveCap(uint256 _tokenTotalReserveCap) external requiresAuth {
-        tokenTotalReserveCap = _tokenTotalReserveCap * BASE_UNIT;
+        tokenTotalReserveCap = _tokenTotalReserveCap;
 
         emit TokenTotalReserveCapUpdate(msg.sender, tokenTotalReserveCap);
     }
