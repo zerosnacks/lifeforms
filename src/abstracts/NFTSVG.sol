@@ -56,7 +56,7 @@ abstract contract NFTSVG {
         // x^3 / x^3 + (1 - x)^3 (steep smoothstep)
         // 0.04 -> 4% of total supply = 1
         // 0 (0) - 75 (0.5) - 150 (1)
-        uint256 x = params.tokenBalance; // 150.000 tons
+        uint256 x = params.tokenBalance / params.totalTokenReserves; // 150.000 tons
         uint256 scale = 100 + (x**3 / x**3 + (1 - x)**3);
 
         return
