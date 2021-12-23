@@ -53,11 +53,7 @@ abstract contract NFTSVG {
 
     function _generateImage(SVGParams memory params) internal pure returns (string memory) {
         // x^3 / x^3 + (1 - x)^3 (steep smoothstep)
-        // 0.04 -> 4% of total supply = 1
-        // 0 (0) - 75 (0.5) - 150 (1)
-        uint256 x = params.tokenBalance >= params.tokenCap ? 1 : params.tokenBalance / 100;
-
-        // uint256 x = params.tokenBalance; // normalize between 0 and target
+        uint256 x = params.tokenBalance / params.tokenCap;
         uint256 scale = 100 + (x**3 / x**3 + (1 - x)**3);
 
         return
