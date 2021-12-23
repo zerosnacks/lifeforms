@@ -127,17 +127,17 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
 
     /// @notice Mint token to address
     /// @param to The address to mint to.
-    function mint(address to) external payable whenUnpaused {
+    function mint(address to) external payable whenUnpaused returns (uint256) {
         require(balanceOf[msg.sender] <= 2, "USER_LIMITED_TO_MINT_TWO");
         require(totalSupply + 1 <= maxSupply, "ALL_TOKENS_MINTED");
         require(isSaleActive, "SALE_NOT_ACTIVE");
         require(salePrice <= msg.value, "INSUFFICIENT_ETHER");
 
-        _mint(
-            to,
-            totalSupply,
-            generateTokenURI(NFTSVG.SVGParams({tokenId: totalSupply, tokenBalance: 0, tokenCap: tokenCap}))
-        );
+        uint256 id = totalSupply;
+
+        _mint(to, totalSupply, generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0, tokenCap: tokenCap})));
+
+        return id;
     }
 
     // ================
