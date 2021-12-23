@@ -73,11 +73,11 @@ contract LifeformTest is DSTestPlus {
 
         assertEq(lifeform.tokenBalances(id), 0);
 
-        lifeform.depositToken(id, 1e18);
+        lifeform.deposit(id, 1e18);
 
         assertEq(lifeform.tokenBalances(id), 1e18);
 
-        lifeform.withdrawToken(id, 1e18);
+        lifeform.withdraw(address(this), id, 1e18);
 
         assertEq(lifeform.tokenBalances(id), 0);
         assertEq(underlying.balanceOf(address(this)), preDepositBal);
@@ -94,23 +94,31 @@ contract LifeformTest is DSTestPlus {
         assertEq(lifeform.balanceOf(address(this)), 1);
         assertEq(lifeform.ownerOf(id), address(this));
 
-        lifeform.depositToken(id, 1e18);
+        lifeform.deposit(id, 1e18);
+        assertEq(underlying.balanceOf(address(this)), 9e18);
 
-        lifeform.safeTransferFrom(address(this), address(alice), id);
+        lifeform.safeTransferFrom(address(this), alice, id);
         assertEq(lifeform.balanceOf(address(this)), 0);
-        assertEq(lifeform.balanceOf(address(alice)), 1);
-        assertEq(lifeform.ownerOf(id), address(alice));
+        assertEq(lifeform.balanceOf(alice), 1);
+        assertEq(lifeform.ownerOf(id), alice);
         assertEq(lifeform.tokenBalances(id), 1e18);
 
-        // underlying.mint(address(alice), 10e18);
-        // underlying.approve(address(alice), 10e18);
-        // LifeformUser(alice).depositToken(id, 1e18);
+        // TODO: Make it so you can send requests to the contract as alice
+
+        assertEq(underlying.balanceOf(alice), 0);
+        lifeform.withdraw(alice, id, 1e18);
+        assertEq(lifeform.tokenBalances(id), 0);
+        assertEq(underlying.balanceOf(alice), 1e18);
+
+        // underlying.mint(alice, 10e18);
+        // underlying.approve(alice, 10e18);
+        // LifeformUser(alice).deposit(id, 1e18);
         // assertEq(lifeform.tokenBalances(id), 2e18);
 
         // TODO: there is currently a problem with the access to the token balance not being transferred to the new user
 
         // alice.withdrawToken(id, 1e18);
-        // assertEq(underlying.balanceOf(address(alice)), 1e18);
+        // assertEq(underlying.balanceOf(alice), 1e18);
 
         // lifeform.safeTransferFrom(address(this), alice, id);
     }
