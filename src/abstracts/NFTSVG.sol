@@ -52,9 +52,11 @@ abstract contract NFTSVG {
     }
 
     function _generateImage(SVGParams memory params) internal pure returns (string memory) {
-        // x^3 / x^3 + (1 - x)^3 (steep smoothstep)
         uint256 x = params.tokenBalance / params.tokenCap;
-        uint256 scale = 100 + (x**3 / x**3 + (1 - x)**3);
+        // 0 = 100
+        // 1 = 2500
+        // x^3 / (x^3 + (1 - x)^3) (steep smoothstep)
+        uint256 scale = 100 + 2400 * (x**3 / (x**3 + (1 - x)**3));
 
         return
             Base64.encode(

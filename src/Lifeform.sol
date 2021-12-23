@@ -144,12 +144,6 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
     // ERC20-LIKE LOGIC
     // ================
 
-    /// @notice Approve this contract for moving underlying tokens
-    /// @param underlyingAmount The amount of underlying tokens to approve.
-    function approveToken(uint256 underlyingAmount) external whenUnpaused {
-        UNDERLYING.approve(address(this), underlyingAmount);
-    }
-
     /// @notice Deposit a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to deposit to.
     /// @param underlyingAmount The amount of the underlying tokens to deposit.
