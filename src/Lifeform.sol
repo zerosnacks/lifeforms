@@ -110,7 +110,7 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
         uint256 _salePrice,
         uint256 _tokenCap,
         ERC20 _underlying
-    ) ERC721(_name, _symbol, "") Trust(msg.sender) {
+    ) ERC721(_name, _symbol) Trust(msg.sender) {
         maxSupply = _maxSupply;
         salePrice = _salePrice;
         tokenCap = _tokenCap;
@@ -217,7 +217,7 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
     // ====================
 
     /// @notice Sets the token reserve cap.
-    /// @param _tokenCap The token amount allowed to be deposited in the contract.
+    /// @param _tokenCap The token amount allowed to be deposited per token id.
     function setTokenCap(uint256 _tokenCap) external requiresTrust {
         tokenCap = _tokenCap;
 
