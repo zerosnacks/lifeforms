@@ -73,6 +73,9 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @notice Price of each minted token instance.
     uint256 public salePrice;
 
+    /// @notice Internal mapping of TokenURIs.
+    mapping(uint256 => string) private tokenURIs;
+
     // =========
     // MODIFIERS
     // =========
@@ -107,7 +110,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         uint256 _salePrice,
         uint256 _tokenTotalReserveCap,
         ERC20 _underlying
-    ) ERC721(_name, _symbol) Auth(Auth(msg.sender).owner(), Auth(msg.sender).authority()) {
+    ) ERC721(_name, _symbol, "") Auth(Auth(msg.sender).owner(), Auth(msg.sender).authority()) {
         maxSupply = _maxSupply;
         salePrice = _salePrice;
         UNDERLYING = _underlying;
@@ -119,6 +122,9 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     // MINT LOGIC
     // ==========
 
+    // TODO: verify if totalSupply is safe to use as tokenId
+    // TODO: safely devide by BASE_UNIT using FixedPointerMath
+
     /// @notice Mint token to address
     /// @param to The address to mint to.
     function mint(address to) external payable whenUnpaused {
@@ -127,21 +133,17 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         require(isSaleActive, "SALE_NOT_ACTIVE");
         require(salePrice <= msg.value, "INSUFFICIENT_ETHER");
 
-        _mint(to, totalSupply, "");
-    }
-
-    /// @notice Get the token URI by token id.
-    /// @param tokenId The token id to get token URI of.
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require(ownerOf[tokenId] != address(0), "TOKEN_MUST_EXIST");
-
-        NFTSVG.SVGParams memory svgParams = NFTSVG.SVGParams({
-            tokenId: tokenId,
-            tokenBalance: tokenBalances[tokenId] / BASE_UNIT,
-            totalTokenReserves: tokenTotalReserve / BASE_UNIT
-        });
-
-        return generateTokenURI(svgParams);
+        _mint(
+            to,
+            totalSupply,
+            generateTokenURI(
+                NFTSVG.SVGParams({
+                    tokenId: totalSupply,
+                    tokenBalance: tokenBalances[totalSupply] / BASE_UNIT,
+                    totalTokenReserves: tokenTotalReserve / BASE_UNIT
+                })
+            )
+        );
     }
 
     // ================
@@ -173,6 +175,14 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
             tokenTotalReserve += underlyingAmount;
         }
 
+        tokenURI[tokenId] = generateTokenURI(
+            NFTSVG.SVGParams({
+                tokenId: tokenId,
+                tokenBalance: tokenBalances[tokenId] / BASE_UNIT,
+                totalTokenReserves: tokenTotalReserve / BASE_UNIT
+            })
+        );
+
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
     }
 
@@ -194,6 +204,14 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
             tokenBalances[tokenId] -= underlyingAmount;
             tokenTotalReserve -= underlyingAmount;
         }
+
+        tokenURI[tokenId] = generateTokenURI(
+            NFTSVG.SVGParams({
+                tokenId: tokenId,
+                tokenBalance: tokenBalances[tokenId] / BASE_UNIT,
+                totalTokenReserves: tokenTotalReserve / BASE_UNIT
+            })
+        );
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
     }
