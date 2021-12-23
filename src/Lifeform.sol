@@ -43,7 +43,7 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
     /// @notice Emitted after token total reserve update.
     /// @param user The address that updated the token total reserve cap.
     /// @param underlyingAmount The amount of underlying tokens that are allowed to be deposited.
-    event TokenTotalReserveCapUpdate(address indexed user, uint256 underlyingAmount);
+    event TokenCapUpdate(address indexed user, uint256 underlyingAmount);
 
     /// @notice Emitted after a succesful rescue.
     /// @param user The address that rescued the ERC20 token.
@@ -73,7 +73,7 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
     /// @notice Price of each minted token instance.
     uint256 public salePrice;
 
-    /// @notice Internal mapping of TokenURIs.
+    /// @notice Internal mapping of all token URIs.
     mapping(uint256 => string) private tokenURIs;
 
     // =========
@@ -93,8 +93,8 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
     /// @notice Tracks the total amount of underlying tokens deposited.
     uint256 public tokenTotalReserve;
 
-    /// @notice Caps the amount of underlying tokens that are allowed to be deposited.
-    uint256 public tokenTotalReserveCap;
+    /// @notice Caps the amount of underlying tokens that are allowed to be deposited per token.
+    uint256 public tokenCap;
 
     /// @notice Mapping of underlying token balances.
     mapping(uint256 => uint256) public tokenBalances;
@@ -108,14 +108,14 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
         string memory _symbol,
         uint256 _maxSupply,
         uint256 _salePrice,
-        uint256 _tokenTotalReserveCap,
+        uint256 _tokenCap,
         ERC20 _underlying
     ) ERC721(_name, _symbol, "") Trust(msg.sender) {
         maxSupply = _maxSupply;
         salePrice = _salePrice;
+        tokenCap = _tokenCap;
         UNDERLYING = _underlying;
         BASE_UNIT = 10**_underlying.decimals();
-        tokenTotalReserveCap = _tokenTotalReserveCap;
     }
 
     // ==========
@@ -133,7 +133,11 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
         require(isSaleActive, "SALE_NOT_ACTIVE");
         require(salePrice <= msg.value, "INSUFFICIENT_ETHER");
 
-        _mint(to, totalSupply, generateTokenURI(NFTSVG.SVGParams({tokenId: totalSupply, tokenBalance: 0})));
+        _mint(
+            to,
+            totalSupply,
+            generateTokenURI(NFTSVG.SVGParams({tokenId: totalSupply, tokenBalance: 0, tokenCap: tokenCap}))
+        );
     }
 
     // ================
@@ -153,7 +157,7 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
         // We don't allow depositing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
-        require(tokenTotalReserve + underlyingAmount <= tokenTotalReserveCap, "TOKEN_RESERVE_IS_CAPPED");
+        require(tokenBalances[tokenId] + underlyingAmount <= tokenCap, "TOKEN_RESERVE_IS_CAPPED");
 
         // Transfer the provided amount of underlying tokens from msg.sender to this contract.
         UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
@@ -166,7 +170,7 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
         }
 
         tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
+            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT, tokenCap: tokenCap})
         );
 
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
@@ -192,7 +196,7 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
         }
 
         tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
+            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT, tokenCap: tokenCap})
         );
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
@@ -213,11 +217,11 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
     // ====================
 
     /// @notice Sets the token reserve cap.
-    /// @param _tokenTotalReserveCap The token amount allowed to be deposited in the contract.
-    function setTokenReserveCap(uint256 _tokenTotalReserveCap) external requiresTrust {
-        tokenTotalReserveCap = _tokenTotalReserveCap;
+    /// @param _tokenCap The token amount allowed to be deposited in the contract.
+    function setTokenCap(uint256 _tokenCap) external requiresTrust {
+        tokenCap = _tokenCap;
 
-        emit TokenTotalReserveCapUpdate(msg.sender, tokenTotalReserveCap);
+        emit TokenCapUpdate(msg.sender, tokenCap);
     }
 
     /// @notice Flips to paused or unpaused.

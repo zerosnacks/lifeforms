@@ -3,18 +3,18 @@ pragma solidity >=0.8.0;
 
 // Libraries
 import {Base64} from "../libraries/Base64.sol";
-
-// import {Strings} from "../libraries/Strings.sol";
+import {Strings} from "../libraries/Strings.sol";
 
 /// @title NFTSVG
 /// @notice Provides a function for generating an SVG
 /// @author Modified from Uniswap V3 (https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/NFTSVG.sol)
 abstract contract NFTSVG {
-    // using Strings for uint256;
+    using Strings for uint256;
 
     struct SVGParams {
         uint256 tokenId;
         uint256 tokenBalance;
+        uint256 tokenCap;
     }
 
     function generateTokenURI(SVGParams memory params) public pure returns (string memory) {
@@ -55,7 +55,9 @@ abstract contract NFTSVG {
         // x^3 / x^3 + (1 - x)^3 (steep smoothstep)
         // 0.04 -> 4% of total supply = 1
         // 0 (0) - 75 (0.5) - 150 (1)
-        uint256 x = params.tokenBalance; // normalize between 0 and target
+        uint256 x = params.tokenBalance >= params.tokenCap ? 1 : params.tokenBalance / 100;
+
+        // uint256 x = params.tokenBalance; // normalize between 0 and target
         uint256 scale = 100 + (x**3 / x**3 + (1 - x)**3);
 
         return
@@ -67,13 +69,13 @@ abstract contract NFTSVG {
                             "<defs>",
                             '<filter id="f1">',
                             '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.02" numOctaves="5" result="t1" seed="',
-                            params.tokenId,
+                            params.tokenId.toString(),
                             '" />',
                             '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.01" numOctaves="5" result="t2" seed="',
-                            params.tokenId,
+                            params.tokenId.toString(),
                             '" />',
                             '<feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="t1" in2="t2" scale="',
-                            scale,
+                            scale.toString(),
                             '" />',
                             "</filter>",
                             "</defs>",

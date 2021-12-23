@@ -22,8 +22,6 @@ abstract contract ERC721 {
 
     string public symbol;
 
-    string public baseURI;
-
     // ===============
     // ERC-721 STORAGE
     // ===============
@@ -44,14 +42,9 @@ abstract contract ERC721 {
     // CONSTRUCTOR
     // ===========
 
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        string memory _baseURI
-    ) {
+    constructor(string memory _name, string memory _symbol) {
         name = _name;
         symbol = _symbol;
-        baseURI = _baseURI;
     }
 
     // =============
