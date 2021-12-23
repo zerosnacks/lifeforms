@@ -52,31 +52,59 @@ abstract contract NFTSVG {
     }
 
     function _generateImage(SVGParams memory params) internal pure returns (string memory) {
-        uint256 x = params.tokenBalance / params.tokenCap;
-        // 0 = 100
-        // 1 = 2500
-        // x^3 / (x^3 + (1 - x)^3) (steep smoothstep)
-        uint256 scale = 100 + 2400 * (x**3 / (x**3 + (1 - x)**3));
-
         return
             Base64.encode(
                 bytes(
                     string(
                         abi.encodePacked(
-                            '<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><filter id="f1">',
-                            '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.02" numOctaves="5" result="t1" seed="',
-                            params.tokenId.toString(),
-                            '" />',
-                            '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.01" numOctaves="5" result="t2" seed="',
-                            params.tokenId.toString(),
-                            '" />',
-                            '<feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="t1" in2="t2" scale="',
-                            scale.toString(),
-                            '" />',
-                            '</filter></defs><rect width="300" height="300" fill="rgba(239,239,239,1)" /><rect width="300" height="300" fill="none" style="filter: url(#f1)" /><rect width="300" height="300" rx="0" ry="0" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1" /></svg>'
+                            '<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
+                            _generateSVGDefs(params),
+                            _generateSVGBody(),
+                            "</svg>"
                         )
                     )
                 )
             );
+    }
+
+    function _generateSVGDefs(SVGParams memory params) private pure returns (string memory svg) {
+        uint256 x = params.tokenBalance / params.tokenCap;
+        // 0 = 100
+        // 1 = 2500
+        // x^3 / (x^3 + (1 - x)^3) (steep smoothstep)
+        uint256 scale = 100 + 4900 * (x**3 / (x**3 + (1 - x)**3));
+
+        svg = string(
+            abi.encodePacked(
+                "<defs>",
+                '<clipPath xmlns="http://www.w3.org/2000/svg" id="c1">',
+                '<rect width="600" height="600" rx="38" ry="38"/>',
+                "</clipPath>",
+                '<filter id="f1">',
+                '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.02" numOctaves="5" result="t1" seed="',
+                params.tokenId.toString(),
+                '"/>',
+                '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.005" numOctaves="5" result="t2" seed="',
+                params.tokenId.toString(),
+                '" />',
+                '<feDisplacementMap xChannelSelector="R" yChannelSelector="G" in1="t1" in2="t2" scale="',
+                scale.toString(),
+                '" />',
+                "</filter>",
+                "</defs>"
+            )
+        );
+    }
+
+    function _generateSVGBody() private pure returns (string memory svg) {
+        svg = string(
+            abi.encodePacked(
+                '<g clip-path="url(#c1)">',
+                '<rect width="600" height="600" fill="rgba(239,239,239,1.0)" />',
+                '<rect width="600" height="600" fill="none" style="filter: url(#f1)" />',
+                '<rect width="600" height="600" rx="38" ry="38" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1" />',
+                "</g>"
+            )
+        );
     }
 }
