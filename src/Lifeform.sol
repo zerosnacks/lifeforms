@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0;
 
 // Vendor
-import {Auth} from "solmate/auth/Auth.sol";
+import {Trust} from "solmate/auth/Trust.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 import {ReentrancyGuard} from "solmate/utils/ReentrancyGuard.sol";
@@ -13,7 +13,7 @@ import {NFTSVG} from "./abstracts/NFTSVG.sol";
 
 /// @title Lifeform
 /// @notice Carbon bearing NFT
-contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
+contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
     using SafeTransferLib for ERC20;
 
     // ======
@@ -110,7 +110,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         uint256 _salePrice,
         uint256 _tokenTotalReserveCap,
         ERC20 _underlying
-    ) ERC721(_name, _symbol, "") Auth(Auth(msg.sender).owner(), Auth(msg.sender).authority()) {
+    ) ERC721(_name, _symbol, "") Trust(msg.sender) {
         maxSupply = _maxSupply;
         salePrice = _salePrice;
         UNDERLYING = _underlying;
@@ -133,17 +133,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         require(isSaleActive, "SALE_NOT_ACTIVE");
         require(salePrice <= msg.value, "INSUFFICIENT_ETHER");
 
-        _mint(
-            to,
-            totalSupply,
-            generateTokenURI(
-                NFTSVG.SVGParams({
-                    tokenId: totalSupply,
-                    tokenBalance: tokenBalances[totalSupply] / BASE_UNIT,
-                    totalTokenReserves: tokenTotalReserve / BASE_UNIT
-                })
-            )
-        );
+        _mint(to, totalSupply, generateTokenURI(NFTSVG.SVGParams({tokenId: totalSupply, tokenBalance: 0})));
     }
 
     // ================
@@ -176,11 +166,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         }
 
         tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({
-                tokenId: tokenId,
-                tokenBalance: tokenBalances[tokenId] / BASE_UNIT,
-                totalTokenReserves: tokenTotalReserve / BASE_UNIT
-            })
+            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
 
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
@@ -206,11 +192,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
         }
 
         tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({
-                tokenId: tokenId,
-                tokenBalance: tokenBalances[tokenId] / BASE_UNIT,
-                totalTokenReserves: tokenTotalReserve / BASE_UNIT
-            })
+            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
@@ -232,21 +214,21 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
 
     /// @notice Sets the token reserve cap.
     /// @param _tokenTotalReserveCap The token amount allowed to be deposited in the contract.
-    function setTokenReserveCap(uint256 _tokenTotalReserveCap) external requiresAuth {
+    function setTokenReserveCap(uint256 _tokenTotalReserveCap) external requiresTrust {
         tokenTotalReserveCap = _tokenTotalReserveCap;
 
         emit TokenTotalReserveCapUpdate(msg.sender, tokenTotalReserveCap);
     }
 
     /// @notice Flips to paused or unpaused.
-    function flipPause() external requiresAuth {
+    function flipPause() external requiresTrust {
         isPaused = !isPaused;
 
         emit Paused(msg.sender, isPaused);
     }
 
     /// @notice Flips to active or inactive.
-    function flipSale() external requiresAuth {
+    function flipSale() external requiresTrust {
         isSaleActive = !isSaleActive;
 
         emit SaleActive(msg.sender, isSaleActive);
@@ -255,7 +237,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @notice Claim all received funds.
     /// @dev Caller will receive any ETH held as float.
     /// @param to Address to send ETH to.
-    function claim(address to) external requiresAuth {
+    function claim(address to) external requiresTrust {
         payable(to).transfer(address(this).balance);
     }
 
@@ -266,7 +248,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     /// @notice Rescues arbitrary ERC20 tokens send to the contract by sending them to the contract owner.
     /// @dev Caller will receive any ERC20 token held as float.
     /// @param token Address of ERC20 token to rescue.
-    function rescue(ERC20 token) external requiresAuth {
+    function rescue(ERC20 token) external requiresTrust {
         ERC20(token).safeTransfer(msg.sender, ERC20(token).balanceOf(address(this)));
 
         emit Rescue(msg.sender, address(token));
@@ -275,7 +257,7 @@ contract Lifeform is ERC721, NFTSVG, Auth, ReentrancyGuard {
     // TODO: remove before launch !!
     /// @notice Self destructs, enabling it to be redeployed.
     /// @dev Caller will receive any ETH held as float.
-    function destroy() external requiresAuth {
+    function destroy() external requiresTrust {
         selfdestruct(payable(msg.sender));
     }
 
