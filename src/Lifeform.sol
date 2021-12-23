@@ -8,13 +8,23 @@ import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 import {ReentrancyGuard} from "solmate/utils/ReentrancyGuard.sol";
 
 // Abstracts
-import {ERC721} from "./abstracts/ERC721.sol";
 import {NFTSVG} from "./abstracts/NFTSVG.sol";
 
 /// @title Lifeform
 /// @notice Carbon bearing NFT
-contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
+/// @author Modified from LexDAO (https://github.com/lexDAO/Kali/blob/main/contracts/tokens/erc721/ERC721.sol)
+contract Lifeform is NFTSVG, Trust, ReentrancyGuard {
     using SafeTransferLib for ERC20;
+
+    // ==============
+    // ERC-721 EVENTS
+    // ==============
+
+    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+
+    event Approval(address indexed owner, address indexed spender, uint256 indexed tokenId);
+
+    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
 
     // ======
     // EVENTS
@@ -50,9 +60,46 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
     /// @param token The ERC20 token that was rescued.
     event Rescue(address indexed user, address token);
 
-    // =========
-    // CONSTANTS
-    // =========
+    // ========================
+    // ERC-721 METADATA STORAGE
+    // ========================
+
+    string public name;
+
+    string public symbol;
+
+    // ===============
+    // ERC-721 STORAGE
+    // ===============
+
+    uint256 public totalSupply;
+
+    mapping(address => uint256) public balanceOf;
+
+    mapping(uint256 => address) public ownerOf;
+
+    mapping(uint256 => address) public getApproved;
+
+    mapping(address => mapping(address => bool)) public isApprovedForAll;
+
+    mapping(uint256 => string) public tokenURI;
+
+    // ==================
+    // ERC20-LIKE STORAGE
+    // ==================
+
+    /// @notice Tracks the total amount of underlying tokens deposited.
+    uint256 public tokenTotalReserve;
+
+    /// @notice Caps the amount of underlying tokens that are allowed to be deposited per token.
+    uint256 public tokenCap;
+
+    /// @notice Mapping of underlying token balances.
+    mapping(uint256 => uint256) public tokenBalances;
+
+    // ================
+    // INTERNAL STORAGE
+    // ================
 
     /// @notice The underlying token the NFT accepts.
     ERC20 public immutable UNDERLYING;
@@ -86,19 +133,6 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
         _;
     }
 
-    // ==================
-    // ERC20-LIKE STORAGE
-    // ==================
-
-    /// @notice Tracks the total amount of underlying tokens deposited.
-    uint256 public tokenTotalReserve;
-
-    /// @notice Caps the amount of underlying tokens that are allowed to be deposited per token.
-    uint256 public tokenCap;
-
-    /// @notice Mapping of underlying token balances.
-    mapping(uint256 => uint256) public tokenBalances;
-
     // ===========
     // CONSTRUCTOR
     // ===========
@@ -110,7 +144,9 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
         uint256 _salePrice,
         uint256 _tokenCap,
         ERC20 _underlying
-    ) ERC721(_name, _symbol) Trust(msg.sender) {
+    ) Trust(msg.sender) {
+        name = _name;
+        symbol = _symbol;
         maxSupply = _maxSupply;
         salePrice = _salePrice;
         tokenCap = _tokenCap;
@@ -118,26 +154,88 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
         BASE_UNIT = 10**_underlying.decimals();
     }
 
-    // ==========
-    // MINT LOGIC
-    // ==========
+    // =============
+    // ERC-165 LOGIC
+    // =============
 
-    // TODO: verify if totalSupply is safe to use as tokenId
-    // TODO: safely devide by BASE_UNIT using FixedPointerMath
+    function supportsInterface(bytes4 interfaceId) public pure virtual returns (bool supported) {
+        supported = interfaceId == 0x80ac58cd || interfaceId == 0x5b5e139f || interfaceId == 0x01ffc9a7;
+    }
 
-    /// @notice Mint token to address
-    /// @param to The address to mint to.
-    function mint(address to) external payable whenUnpaused returns (uint256) {
-        require(balanceOf[msg.sender] <= 2, "USER_LIMITED_TO_MINT_TWO");
-        require(totalSupply + 1 <= maxSupply, "ALL_TOKENS_MINTED");
-        require(isSaleActive, "SALE_NOT_ACTIVE");
-        require(salePrice <= msg.value, "INSUFFICIENT_ETHER");
+    // =============
+    // ERC-721 LOGIC
+    // =============
 
-        uint256 id = totalSupply;
+    function approve(address spender, uint256 tokenId) public virtual {
+        address owner = ownerOf[tokenId];
 
-        _mint(to, totalSupply, generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0, tokenCap: tokenCap})));
+        require(msg.sender == owner || isApprovedForAll[owner][msg.sender], "NOT_APPROVED");
 
-        return id;
+        getApproved[tokenId] = spender;
+
+        emit Approval(owner, spender, tokenId);
+    }
+
+    function setApprovalForAll(address operator, bool approved) public virtual {
+        isApprovedForAll[msg.sender][operator] = approved;
+
+        emit ApprovalForAll(msg.sender, operator, approved);
+    }
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public {
+        require(from == ownerOf[tokenId], "NOT_OWNER");
+
+        require(
+            msg.sender == from || msg.sender == getApproved[tokenId] || isApprovedForAll[from][msg.sender],
+            "NOT_APPROVED"
+        );
+
+        // this is safe because ownership is checked
+        // against decrement, and sum of all user
+        // balances can't exceed 'type(uint256).max'
+        unchecked {
+            balanceOf[from]--;
+
+            balanceOf[to]++;
+        }
+
+        delete getApproved[tokenId];
+
+        ownerOf[tokenId] = to;
+
+        emit Transfer(from, to, tokenId);
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public {
+        safeTransferFrom(from, to, tokenId, "");
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) public {
+        transferFrom(from, to, tokenId);
+
+        if (to.code.length != 0) {
+            // selector = `onERC721Received(address,address,uint256,bytes)`
+            (, bytes memory returned) = to.staticcall(
+                abi.encodeWithSelector(0x150b7a02, msg.sender, from, tokenId, data)
+            );
+
+            bytes4 selector = abi.decode(returned, (bytes4));
+
+            require(selector == 0x150b7a02, "NOT_ERC721_RECEIVER");
+        }
     }
 
     // ================
@@ -204,6 +302,40 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
         address owner = ownerOf[tokenId];
 
         return (spender == owner || getApproved[tokenId] == spender || isApprovedForAll[owner][spender]);
+    }
+
+    // ==========
+    // MINT LOGIC
+    // ==========
+
+    /// @notice Mint token to address
+    /// @param to The address to mint to.
+    function mint(address to) external payable whenUnpaused returns (uint256) {
+        require(balanceOf[msg.sender] <= 2, "USER_LIMITED_TO_MINT_TWO");
+        require(totalSupply + 1 <= maxSupply, "ALL_TOKENS_MINTED");
+        require(isSaleActive, "SALE_NOT_ACTIVE");
+        require(salePrice <= msg.value, "INSUFFICIENT_ETHER");
+
+        uint256 id = totalSupply;
+
+        require(ownerOf[id] == address(0), "ALREADY_MINTED");
+
+        // this is reasonably safe from overflow because incrementing `totalSupply` beyond
+        // 'type(uint256).max' is exceedingly unlikely compared to optimization benefits,
+        // and because the sum of all user balances can't exceed 'type(uint256).max'
+        unchecked {
+            totalSupply++;
+
+            balanceOf[to]++;
+        }
+
+        ownerOf[id] = to;
+
+        tokenURI[id] = generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0, tokenCap: tokenCap}));
+
+        emit Transfer(address(0), to, id);
+
+        return id;
     }
 
     // ====================
