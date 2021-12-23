@@ -63,9 +63,7 @@ abstract contract NFTSVG {
                 bytes(
                     string(
                         abi.encodePacked(
-                            '<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
-                            "<defs>",
-                            '<filter id="f1">',
+                            '<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><filter id="f1">',
                             '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.02" numOctaves="5" result="t1" seed="',
                             params.tokenId.toString(),
                             '" />',
@@ -75,12 +73,7 @@ abstract contract NFTSVG {
                             '<feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="t1" in2="t2" scale="',
                             scale.toString(),
                             '" />',
-                            "</filter>",
-                            "</defs>",
-                            '<rect width="300" height="300" fill="rgba(239,239,239,1)" />',
-                            '<rect width="300" height="300" fill="none" style="filter: url(#f1)" />',
-                            '<rect width="300" height="300" rx="0" ry="0" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1" />',
-                            "</svg>"
+                            '</filter></defs><rect width="300" height="300" fill="rgba(239,239,239,1)" /><rect width="300" height="300" fill="none" style="filter: url(#f1)" /><rect width="300" height="300" rx="0" ry="0" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1" /></svg>'
                         )
                     )
                 )
