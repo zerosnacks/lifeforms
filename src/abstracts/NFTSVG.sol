@@ -69,9 +69,6 @@ abstract contract NFTSVG {
 
     function _generateSVGDefs(SVGParams memory params) private pure returns (string memory svg) {
         uint256 x = params.tokenBalance / params.tokenCap;
-        // 0 = 100
-        // 1 = 2500
-        // x^3 / (x^3 + (1 - x)^3) (steep smoothstep)
         uint256 scale = 100 + 4900 * (x**3 / (x**3 + (1 - x)**3));
 
         svg = string(
