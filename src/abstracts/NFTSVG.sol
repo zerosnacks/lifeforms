@@ -38,16 +38,16 @@ abstract contract NFTSVG {
     }
 
     function _generateName(SVGParams memory params) internal pure returns (string memory) {
-        return string(abi.encodePacked("Carbon - ", params.tokenId.toString()));
+        return string(abi.encodePacked("Lifeform - ", params.tokenId.toString()));
     }
 
     function _generateDescription(SVGParams memory params) internal pure returns (string memory) {
         return
             string(
                 abi.encodePacked(
-                    "Carbon bearing asset storing ",
+                    "Lifeform storing ",
                     params.tokenBalance.toString(),
-                    " Base Carbon Tonne tokens."
+                    " tonnes of carbon from the Verra Verified Carbon Unit (VCU) registry from 2008 or later, bridged by the Toucan Protocol."
                 )
             );
     }
