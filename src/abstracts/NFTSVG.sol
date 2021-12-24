@@ -69,6 +69,7 @@ abstract contract NFTSVG {
     }
 
     function _generateSVGDefs(SVGParams memory params) private pure returns (string memory svg) {
+        /// @notice tokenBalance has been scaled by 10**18, so say 100 * 15 = 1500
         uint256 scale = params.tokenScalar * params.tokenBalance;
 
         svg = string(
