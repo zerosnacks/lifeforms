@@ -36,8 +36,9 @@ abstract contract NFTSVG {
                                 '", "image": "',
                                 "data:image/svg+xml;base64,",
                                 _generateImage(params),
+                                '", "attributes": ',
                                 _generateAttributes(params),
-                                '"}'
+                                "}"
                             )
                         )
                     )
@@ -61,14 +62,7 @@ abstract contract NFTSVG {
     }
 
     function _generateAttributes(SVGParams memory params) internal pure returns (string memory) {
-        return
-            string(
-                abi.encodePacked(
-                    '"attributes": [{ "trait_type": "Storage", "value": ',
-                    params.tokenBalance.toString(),
-                    " }]"
-                )
-            );
+        return string(abi.encodePacked('[{ "trait_type": "Storage", "value": ', params.tokenBalance.toString(), "}]"));
     }
 
     function _generateImage(SVGParams memory params) internal pure returns (string memory) {
