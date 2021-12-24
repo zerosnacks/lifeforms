@@ -44,8 +44,13 @@ contract Lifeform is ERC721, NFTSVG, Trust {
 
     /// @notice Emitted after token total reserve update.
     /// @param user The address that updated the token total reserve cap.
-    /// @param underlyingAmount The amount of underlying tokens that are allowed to be deposited.
-    event TokenCapUpdate(address indexed user, uint256 underlyingAmount);
+    /// @param newTokenCap The amount of underlying tokens that are allowed to be deposited.
+    event TokenCapUpdate(address indexed user, uint256 newTokenCap);
+
+    /// @notice Emitted after token total reserve update.
+    /// @param user The address that updated the token scalar.
+    /// @param newTokenScalar The amount of effect that the deposited underlying tokens have the visual image.
+    event TokenScalarUpdate(address indexed user, uint256 newTokenScalar);
 
     /// @notice Emitted after a succesful rescue.
     /// @param user The address that rescued the ERC20 token.
@@ -61,6 +66,9 @@ contract Lifeform is ERC721, NFTSVG, Trust {
 
     /// @notice Caps the amount of underlying tokens that are allowed to be deposited per token.
     uint256 public tokenCap;
+
+    /// @notice The amount of effect that the deposited underlying tokens have the visual image.
+    uint256 public tokenScalar;
 
     /// @notice Mapping of underlying token balances.
     mapping(uint256 => uint256) public tokenBalances;
@@ -109,11 +117,13 @@ contract Lifeform is ERC721, NFTSVG, Trust {
         uint256 _maxSupply,
         uint256 _salePrice,
         uint256 _tokenCap,
+        uint256 _tokenScalar,
         ERC20 _underlying
     ) ERC721("Lifeform", "LIFE") Trust(msg.sender) {
         maxSupply = _maxSupply;
         salePrice = _salePrice;
         tokenCap = _tokenCap;
+        tokenScalar = _tokenScalar;
         UNDERLYING = _underlying;
         BASE_UNIT = 10**_underlying.decimals();
     }
@@ -142,7 +152,11 @@ contract Lifeform is ERC721, NFTSVG, Trust {
         }
 
         tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
+            NFTSVG.SVGParams({
+                tokenId: tokenId,
+                tokenBalance: tokenBalances[tokenId] / BASE_UNIT,
+                tokenScalar: tokenScalar
+            })
         );
 
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
@@ -170,7 +184,11 @@ contract Lifeform is ERC721, NFTSVG, Trust {
         }
 
         tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
+            NFTSVG.SVGParams({
+                tokenId: tokenId,
+                tokenBalance: tokenBalances[tokenId] / BASE_UNIT,
+                tokenScalar: tokenScalar
+            })
         );
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
@@ -213,7 +231,7 @@ contract Lifeform is ERC721, NFTSVG, Trust {
 
         ownerOf[id] = to;
 
-        tokenURI[id] = generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0}));
+        tokenURI[id] = generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0, tokenScalar: tokenScalar}));
 
         emit Transfer(address(0), to, id);
 
@@ -223,6 +241,14 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     // ====================
     // ADMINISTRATIVE LOGIC
     // ====================
+
+    /// @notice Sets the token scalar.
+    /// @param _tokenScalar The amount of effect that the deposited underlying tokens have the visual image.
+    function setTokenScalar(uint256 _tokenScalar) external requiresTrust {
+        tokenScalar = _tokenScalar;
+
+        emit TokenScalarUpdate(msg.sender, tokenScalar);
+    }
 
     /// @notice Sets the token reserve cap.
     /// @param _tokenCap The token amount allowed to be deposited per token id.

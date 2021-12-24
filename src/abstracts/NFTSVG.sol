@@ -18,6 +18,7 @@ abstract contract NFTSVG {
     struct SVGParams {
         uint256 tokenId;
         uint256 tokenBalance;
+        uint256 tokenScalar;
     }
 
     function generateTokenURI(SVGParams memory params) public pure returns (string memory) {
@@ -68,7 +69,7 @@ abstract contract NFTSVG {
     }
 
     function _generateSVGDefs(SVGParams memory params) private pure returns (string memory svg) {
-        uint256 scale = 100 * params.tokenBalance;
+        uint256 scale = params.tokenScalar * params.tokenBalance;
 
         svg = string(
             abi.encodePacked(
