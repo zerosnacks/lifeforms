@@ -40,7 +40,7 @@ contract LifeformTest is DSTestPlus {
     string private symbol = "LIFE";
     uint256 private maxSupply = 1000;
     uint256 private salePrice = 1e16;
-    uint256 private tokenCap = 5e18;
+    uint256 private tokenCap = 25e18;
     uint256 private tokenScalar = 100;
 
     // Users
@@ -108,8 +108,8 @@ contract LifeformTest is DSTestPlus {
     }
 
     function testTokenURI() public {
-        underlying.mint(self, 10e18);
-        underlying.approve(address(lifeform), 10e18);
+        underlying.mint(self, 100e18);
+        underlying.approve(address(lifeform), 100e18);
         lifeform.flipSale();
 
         uint256 id = lifeform.mint{value: salePrice}(self);
@@ -119,7 +119,7 @@ contract LifeformTest is DSTestPlus {
 
         emit log_named_string("TokenURI", lifeform.tokenURI(id));
 
-        lifeform.deposit(id, 3e18);
+        lifeform.deposit(id, 20e18);
 
         emit log_named_string("TokenURI", lifeform.tokenURI(id));
     }
