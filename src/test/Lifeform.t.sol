@@ -9,6 +9,8 @@ import {MockERC20} from "solmate/test/utils/mocks/MockERC20.sol";
 // Contracts
 import {Lifeform} from "../Lifeform.sol";
 
+contract User {}
+
 contract LifeformTest is DSTestPlus {
     Lifeform lifeform;
     MockERC20 underlying;
@@ -20,8 +22,12 @@ contract LifeformTest is DSTestPlus {
     uint256 private tokenCap = 5e18;
 
     // Users
-    address private alice = address(bytes20("alice"));
-    address private bob = address(bytes20("bob"));
+    User userAlice = new User();
+    User userBob = new User();
+
+    address internal immutable self = address(this);
+    address internal immutable alice = address(userAlice);
+    address internal immutable bob = address(userBob);
 
     // Proxy
     // 0x2f800db0fdb5223b3c3f354886d907a671414a7f
@@ -58,18 +64,18 @@ contract LifeformTest is DSTestPlus {
     }
 
     function testAtomicDepositWithdraw() public {
-        underlying.mint(address(this), 10e18);
+        underlying.mint(self, 10e18);
         underlying.approve(address(lifeform), 10e18);
 
         lifeform.flipSale();
 
-        uint256 id = lifeform.mint{value: 0.1 ether}(address(this));
+        uint256 id = lifeform.mint{value: 0.1 ether}(self);
 
         assertEq(lifeform.totalSupply(), 1);
-        assertEq(lifeform.balanceOf(address(this)), 1);
-        assertEq(lifeform.ownerOf(id), address(this));
+        assertEq(lifeform.balanceOf(self), 1);
+        assertEq(lifeform.ownerOf(id), self);
 
-        uint256 preDepositBal = underlying.balanceOf(address(this));
+        uint256 preDepositBal = underlying.balanceOf(self);
 
         assertEq(lifeform.tokenBalances(id), 0);
 
@@ -77,28 +83,28 @@ contract LifeformTest is DSTestPlus {
 
         assertEq(lifeform.tokenBalances(id), 1e18);
 
-        lifeform.withdraw(address(this), id, 1e18);
+        lifeform.withdraw(self, id, 1e18);
 
         assertEq(lifeform.tokenBalances(id), 0);
-        assertEq(underlying.balanceOf(address(this)), preDepositBal);
+        assertEq(underlying.balanceOf(self), preDepositBal);
     }
 
     function testAtomicTransferAliceBob() public {
-        underlying.mint(address(this), 10e18);
+        underlying.mint(self, 10e18);
         underlying.approve(address(lifeform), 10e18);
 
         lifeform.flipSale();
 
-        uint256 id = lifeform.mint{value: 0.1 ether}(address(this));
+        uint256 id = lifeform.mint{value: 0.1 ether}(self);
         assertEq(lifeform.totalSupply(), 1);
-        assertEq(lifeform.balanceOf(address(this)), 1);
-        assertEq(lifeform.ownerOf(id), address(this));
+        assertEq(lifeform.balanceOf(self), 1);
+        assertEq(lifeform.ownerOf(id), self);
 
         lifeform.deposit(id, 1e18);
-        assertEq(underlying.balanceOf(address(this)), 9e18);
+        assertEq(underlying.balanceOf(self), 9e18);
 
-        lifeform.safeTransferFrom(address(this), alice, id);
-        assertEq(lifeform.balanceOf(address(this)), 0);
+        lifeform.safeTransferFrom(self, alice, id);
+        assertEq(lifeform.balanceOf(self), 0);
         assertEq(lifeform.balanceOf(alice), 1);
         assertEq(lifeform.ownerOf(id), alice);
         assertEq(lifeform.tokenBalances(id), 1e18);
@@ -120,6 +126,6 @@ contract LifeformTest is DSTestPlus {
         // alice.withdrawToken(id, 1e18);
         // assertEq(underlying.balanceOf(alice), 1e18);
 
-        // lifeform.safeTransferFrom(address(this), alice, id);
+        // lifeform.safeTransferFrom(self, alice, id);
     }
 }
