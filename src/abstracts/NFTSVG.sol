@@ -34,13 +34,17 @@ abstract contract NFTSVG {
     }
 
     function _generateName(SVGParams memory params) internal pure returns (string memory) {
-        return string(abi.encodePacked("Carbon - ", params.tokenId));
+        return string(abi.encodePacked("Carbon - ", params.tokenId.toString()));
     }
 
     function _generateDescription(SVGParams memory params) internal pure returns (string memory) {
         return
             string(
-                abi.encodePacked("Carbon bearing asset storing ", params.tokenBalance, " Base Carbon Tonne tokens.")
+                abi.encodePacked(
+                    "Carbon bearing asset storing ",
+                    params.tokenBalance.toString(),
+                    " Base Carbon Tonne tokens."
+                )
             );
     }
 
