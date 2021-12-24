@@ -23,16 +23,20 @@ abstract contract NFTSVG {
 
     function generateTokenURI(SVGParams memory params) public pure returns (string memory) {
         return
-            string(
-                abi.encodePacked(
-                    '{"name":"',
-                    _generateName(params),
-                    '", "description":"',
-                    _generateDescription(params),
-                    '", "image": "',
-                    "data:image/svg+xml;base64,",
-                    _generateImage(params),
-                    '"}'
+            Base64.encode(
+                bytes(
+                    string(
+                        abi.encodePacked(
+                            '{"name":"',
+                            _generateName(params),
+                            '", "description":"',
+                            _generateDescription(params),
+                            '", "image": "',
+                            "data:image/svg+xml;base64,",
+                            _generateImage(params),
+                            '"}'
+                        )
+                    )
                 )
             );
     }
