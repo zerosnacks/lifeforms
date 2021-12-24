@@ -39,7 +39,7 @@ contract LifeformTest is DSTestPlus {
     string private name = "Lifeform";
     string private symbol = "LIFE";
     uint256 private maxSupply = 1000;
-    uint256 private salePrice = 0.1 ether;
+    uint256 private salePrice = 1e16;
     uint256 private tokenCap = 5e18;
 
     // Users
@@ -57,8 +57,6 @@ contract LifeformTest is DSTestPlus {
         underlying = new MockERC20("Mock Token", "TKN", 18);
 
         lifeform = new Lifeform(
-            name, // name
-            symbol, // symbol
             maxSupply, // maxSupply
             salePrice, // salePrice
             tokenCap, // tokenCap
@@ -74,7 +72,7 @@ contract LifeformTest is DSTestPlus {
     function testMint(address usr) public {
         lifeform.flipSale();
 
-        uint256 id = lifeform.mint{value: 0.1 ether}(usr); // Of course we have to send money with
+        uint256 id = lifeform.mint{value: salePrice}(usr); // Of course we have to send money with
 
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(usr), 1);
@@ -87,7 +85,7 @@ contract LifeformTest is DSTestPlus {
 
         lifeform.flipSale();
 
-        uint256 id = lifeform.mint{value: 0.1 ether}(self);
+        uint256 id = lifeform.mint{value: salePrice}(self);
 
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(self), 1);
@@ -107,45 +105,58 @@ contract LifeformTest is DSTestPlus {
         assertEq(underlying.balanceOf(self), preDepositBal);
     }
 
-    function testAtomicTransfer() public {
+    function testTokenURI() public {
         underlying.mint(self, 10e18);
         underlying.approve(address(lifeform), 10e18);
-
         lifeform.flipSale();
 
-        uint256 id = lifeform.mint{value: 0.1 ether}(self);
+        uint256 id = lifeform.mint{value: salePrice}(self);
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(self), 1);
         assertEq(lifeform.ownerOf(id), self);
 
-        lifeform.deposit(id, 1e18);
-        assertEq(underlying.balanceOf(self), 9e18);
-
-        lifeform.safeTransferFrom(self, alice, id);
-        assertEq(lifeform.balanceOf(self), 0);
-        assertEq(lifeform.balanceOf(alice), 1);
-        assertEq(lifeform.ownerOf(id), alice);
-        assertEq(lifeform.tokenBalances(id), 1e18);
-
-        // TODO: Make it so you can send requests to the contract as alice
-
-        emit log_named_address("testAtomicTransfer", msg.sender);
-
-        assertEq(underlying.balanceOf(alice), 0);
-        User(alice).doWithdraw(id, 1e18);
-        assertEq(lifeform.tokenBalances(id), 0);
-        assertEq(underlying.balanceOf(alice), 1e18);
-
-        underlying.mint(alice, 10e18);
-        underlying.approve(alice, 10e18);
-        User(alice).doDeposit(id, 1e18);
-        assertEq(lifeform.tokenBalances(id), 2e18);
-
-        // TODO: there is currently a problem with the access to the token balance not being transferred to the new user
-
-        // alice.withdrawToken(id, 1e18);
-        // assertEq(underlying.balanceOf(alice), 1e18);
-
-        // lifeform.safeTransferFrom(self, alice, id);
+        emit log_named_string("TokenURI", lifeform.tokenURI(id));
     }
+
+    // function testAtomicTransfer() public {
+    //     underlying.mint(self, 10e18);
+    //     underlying.approve(address(lifeform), 10e18);
+
+    //     lifeform.flipSale();
+
+    //     uint256 id = lifeform.mint{value: salePrice}(self);
+    //     assertEq(lifeform.totalSupply(), 1);
+    //     assertEq(lifeform.balanceOf(self), 1);
+    //     assertEq(lifeform.ownerOf(id), self);
+
+    //     lifeform.deposit(id, 1e18);
+    //     assertEq(underlying.balanceOf(self), 9e18);
+
+    //     lifeform.safeTransferFrom(self, alice, id);
+    //     assertEq(lifeform.balanceOf(self), 0);
+    //     assertEq(lifeform.balanceOf(alice), 1);
+    //     assertEq(lifeform.ownerOf(id), alice);
+    //     assertEq(lifeform.tokenBalances(id), 1e18);
+
+    //     // TODO: Make it so you can send requests to the contract as alice
+
+    //     emit log_named_address("testAtomicTransfer", msg.sender);
+
+    //     assertEq(underlying.balanceOf(alice), 0);
+    //     User(alice).doWithdraw(id, 1e18);
+    //     assertEq(lifeform.tokenBalances(id), 0);
+    //     assertEq(underlying.balanceOf(alice), 1e18);
+
+    //     underlying.mint(alice, 10e18);
+    //     underlying.approve(alice, 10e18);
+    //     User(alice).doDeposit(id, 1e18);
+    //     assertEq(lifeform.tokenBalances(id), 2e18);
+
+    //     // TODO: there is currently a problem with the access to the token balance not being transferred to the new user
+
+    //     // alice.withdrawToken(id, 1e18);
+    //     // assertEq(underlying.balanceOf(alice), 1e18);
+
+    //     // lifeform.safeTransferFrom(self, alice, id);
+    // }
 }

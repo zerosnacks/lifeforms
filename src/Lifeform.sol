@@ -104,13 +104,11 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     // ===========
 
     constructor(
-        string memory _name,
-        string memory _symbol,
         uint256 _maxSupply,
         uint256 _salePrice,
         uint256 _tokenCap,
         ERC20 _underlying
-    ) ERC721(_name, _symbol) Trust(msg.sender) {
+    ) ERC721("Lifeform", "LIFE") Trust(msg.sender) {
         maxSupply = _maxSupply;
         salePrice = _salePrice;
         tokenCap = _tokenCap;

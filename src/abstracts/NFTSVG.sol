@@ -21,21 +21,14 @@ abstract contract NFTSVG {
         return
             string(
                 abi.encodePacked(
-                    "data:application/json;base64,",
-                    Base64.encode(
-                        bytes(
-                            abi.encodePacked(
-                                '{"name":"',
-                                _generateName(params),
-                                '", "description":"',
-                                _generateDescription(params),
-                                '", "image": "',
-                                "data:image/svg+xml;base64,",
-                                _generateImage(params),
-                                '"}'
-                            )
-                        )
-                    )
+                    '{"name":"',
+                    _generateName(params),
+                    '", "description":"',
+                    _generateDescription(params),
+                    '", "image": "',
+                    "data:image/svg+xml;base64,",
+                    _generateImage(params),
+                    '"}'
                 )
             );
     }
