@@ -4,13 +4,9 @@ Various experiments with carbon credits on chain
 
 ## Lifeform
 
-Carbon bearing NFTs, allows you to store BCT (Base Carbon Tonne) carbon credits inside of NFTs. Depending on how much you store inside compared to the total supply you can change the visual result of your carbon lifeform. Because deposits are happening constantly your Lifeform never looks the same.
+Carbon bearing NFT, allows you to store BCT (Base Carbon Tonne) carbon credits inside of NFTs. Depending on how much you store inside compared you can change the visual result of your carbon lifeform.
 
 ![Lifeform](./assets/Lifeform.png)
-
-## Fluid vault
-
-Carbon lockup vault with streaming timelock, allows voters to direct tokenstream. Builds on top of Superfluid.
 
 ## Acknowledgements
 

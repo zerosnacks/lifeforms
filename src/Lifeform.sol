@@ -5,7 +5,6 @@ pragma solidity >=0.8.0;
 import {Trust} from "solmate/auth/Trust.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
-import {ReentrancyGuard} from "solmate/utils/ReentrancyGuard.sol";
 
 // Abstracts
 import {ERC721} from "./abstracts/ERC721.sol";
@@ -14,7 +13,7 @@ import {NFTSVG} from "./abstracts/NFTSVG.sol";
 /// @title Lifeform
 /// @notice Carbon bearing NFT
 /// @author Modified from LexDAO (https://github.com/lexDAO/Kali/blob/main/contracts/tokens/erc721/ERC721.sol)
-contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
+contract Lifeform is ERC721, NFTSVG, Trust {
     using SafeTransferLib for ERC20;
 
     // ======
@@ -126,7 +125,7 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
     /// @notice Deposit a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to deposit to.
     /// @param underlyingAmount The amount of the underlying tokens to deposit.
-    function deposit(uint256 tokenId, uint256 underlyingAmount) external nonReentrant whenUnpaused {
+    function deposit(uint256 tokenId, uint256 underlyingAmount) external whenUnpaused {
         // We don't allow depositing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
@@ -152,7 +151,7 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
     /// @notice Withdraw a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to withdraw from.
     /// @param underlyingAmount The amount of underlying tokens to withdraw.
-    function withdraw(uint256 tokenId, uint256 underlyingAmount) external nonReentrant whenUnpaused {
+    function withdraw(uint256 tokenId, uint256 underlyingAmount) external whenUnpaused {
         // TODO: at the moment everyone is able to withdraw anyones balance to the owners account (grift)
 
         // We don't allow withdrawing 0 to prevent emitting a useless event.
