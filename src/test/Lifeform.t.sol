@@ -12,7 +12,25 @@ import {Lifeform} from "../Lifeform.sol";
 // Utilities
 import {ERC721Holder} from "./utilities/ERC721Holder.sol";
 
-contract User is ERC721Holder {}
+contract User is ERC721Holder, DSTestPlus {
+    Lifeform lifeform;
+
+    constructor(Lifeform _lifeform) {
+        lifeform = _lifeform;
+    }
+
+    function doDeposit(uint256 tokenId, uint256 underlyingAmount) public {
+        emit log_named_address("doDeposit", msg.sender);
+
+        return lifeform.deposit(tokenId, underlyingAmount);
+    }
+
+    function doWithdraw(uint256 tokenId, uint256 underlyingAmount) public {
+        emit log_named_address("doWithdraw", msg.sender);
+
+        return lifeform.withdraw(tokenId, underlyingAmount);
+    }
+}
 
 contract LifeformTest is DSTestPlus {
     Lifeform lifeform;
@@ -25,12 +43,9 @@ contract LifeformTest is DSTestPlus {
     uint256 private tokenCap = 5e18;
 
     // Users
-    User aliceUser = new User();
-    User bobUser = new User();
-
     address internal immutable self = address(this);
-    address internal immutable alice = address(aliceUser);
-    address internal immutable bob = address(bobUser);
+    address internal immutable alice = address(new User(lifeform));
+    address internal immutable bob = address(new User(lifeform));
 
     // Proxy
     // 0x2f800db0fdb5223b3c3f354886d907a671414a7f
@@ -86,13 +101,13 @@ contract LifeformTest is DSTestPlus {
 
         assertEq(lifeform.tokenBalances(id), 1e18);
 
-        lifeform.withdraw(self, id, 1e18);
+        lifeform.withdraw(id, 1e18);
 
         assertEq(lifeform.tokenBalances(id), 0);
         assertEq(underlying.balanceOf(self), preDepositBal);
     }
 
-    function testAtomicTransferAliceBob() public {
+    function testAtomicTransfer() public {
         underlying.mint(self, 10e18);
         underlying.approve(address(lifeform), 10e18);
 
@@ -114,15 +129,17 @@ contract LifeformTest is DSTestPlus {
 
         // TODO: Make it so you can send requests to the contract as alice
 
-        // assertEq(underlying.balanceOf(alice), 0);
-        // lifeform.withdraw(alice, id, 1e18);
-        // assertEq(lifeform.tokenBalances(id), 0);
-        // assertEq(underlying.balanceOf(alice), 1e18);
+        emit log_named_address("testAtomicTransfer", msg.sender);
 
-        // underlying.mint(alice, 10e18);
-        // underlying.approve(alice, 10e18);
-        // LifeformUser(alice).deposit(id, 1e18);
-        // assertEq(lifeform.tokenBalances(id), 2e18);
+        assertEq(underlying.balanceOf(alice), 0);
+        User(alice).doWithdraw(id, 1e18);
+        assertEq(lifeform.tokenBalances(id), 0);
+        assertEq(underlying.balanceOf(alice), 1e18);
+
+        underlying.mint(alice, 10e18);
+        underlying.approve(alice, 10e18);
+        User(alice).doDeposit(id, 1e18);
+        assertEq(lifeform.tokenBalances(id), 2e18);
 
         // TODO: there is currently a problem with the access to the token balance not being transferred to the new user
 

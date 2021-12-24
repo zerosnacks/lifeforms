@@ -152,20 +152,16 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
     /// @notice Withdraw a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to withdraw from.
     /// @param underlyingAmount The amount of underlying tokens to withdraw.
-    function withdraw(
-        address to,
-        uint256 tokenId,
-        uint256 underlyingAmount
-    ) external nonReentrant whenUnpaused {
+    function withdraw(uint256 tokenId, uint256 underlyingAmount) external nonReentrant whenUnpaused {
         // TODO: at the moment everyone is able to withdraw anyones balance to the owners account (grift)
 
         // We don't allow withdrawing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
-        require(_isApprovedOrOwner(tokenId, to), "TOKEN_MUST_BE_OWNED");
+        require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
         require(underlyingAmount <= tokenBalances[tokenId], "AMOUNT_EXCEEDS_TOKEN_ID_BALANCE");
 
         // Transfer the provided amount of underlying tokens to msg.sender from this contract.
-        UNDERLYING.safeTransfer(to, underlyingAmount);
+        UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
 
         // Cannot underflow because a user's balance
         // will never be larger than the total supply.
@@ -178,7 +174,7 @@ contract Lifeform is ERC721, NFTSVG, Trust, ReentrancyGuard {
             NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT, tokenCap: tokenCap})
         );
 
-        emit TokenWithdraw(to, tokenId, underlyingAmount);
+        emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
     }
 
     /// @notice Check if spender owns the token or is approved to interact with the token.
