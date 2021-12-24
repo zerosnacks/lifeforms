@@ -5,6 +5,7 @@ pragma solidity >=0.8.0;
 import {Trust} from "solmate/auth/Trust.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
+import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 
 // Abstracts
 import {ERC721} from "./abstracts/ERC721.sol";
@@ -15,6 +16,7 @@ import {NFTSVG} from "./abstracts/NFTSVG.sol";
 /// @author Modified from LexDAO (https://github.com/lexDAO/Kali/blob/main/contracts/tokens/erc721/ERC721.sol)
 contract Lifeform is ERC721, NFTSVG, Trust {
     using SafeTransferLib for ERC20;
+    using FixedPointMathLib for uint256;
 
     // ======
     // EVENTS
@@ -140,7 +142,7 @@ contract Lifeform is ERC721, NFTSVG, Trust {
         }
 
         tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT, tokenCap: tokenCap})
+            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
 
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
@@ -168,7 +170,7 @@ contract Lifeform is ERC721, NFTSVG, Trust {
         }
 
         tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT, tokenCap: tokenCap})
+            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
@@ -211,7 +213,7 @@ contract Lifeform is ERC721, NFTSVG, Trust {
 
         ownerOf[id] = to;
 
-        tokenURI[id] = generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0, tokenCap: tokenCap}));
+        tokenURI[id] = generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0}));
 
         emit Transfer(address(0), to, id);
 

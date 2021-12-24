@@ -116,6 +116,10 @@ contract LifeformTest is DSTestPlus {
         assertEq(lifeform.ownerOf(id), self);
 
         emit log_named_string("TokenURI", lifeform.tokenURI(id));
+
+        lifeform.deposit(id, 3e18);
+
+        emit log_named_string("TokenURI", lifeform.tokenURI(id));
     }
 
     // function testAtomicTransfer() public {

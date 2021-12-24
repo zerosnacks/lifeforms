@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity >=0.8.0;
 
+// Vendor
+import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
+
 // Libraries
 import {Base64} from "../libraries/Base64.sol";
 import {Strings} from "../libraries/Strings.sol";
@@ -9,12 +12,12 @@ import {Strings} from "../libraries/Strings.sol";
 /// @notice Provides a function for generating an SVG
 /// @author Modified from Uniswap V3 (https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/NFTSVG.sol)
 abstract contract NFTSVG {
+    using FixedPointMathLib for uint256;
     using Strings for uint256;
 
     struct SVGParams {
         uint256 tokenId;
         uint256 tokenBalance;
-        uint256 tokenCap;
     }
 
     function generateTokenURI(SVGParams memory params) public pure returns (string memory) {
@@ -65,8 +68,7 @@ abstract contract NFTSVG {
     }
 
     function _generateSVGDefs(SVGParams memory params) private pure returns (string memory svg) {
-        uint256 x = params.tokenBalance / params.tokenCap;
-        uint256 scale = 100 + 4900 * (x**3 / (x**3 + (1 - x)**3));
+        uint256 scale = 100 * params.tokenBalance;
 
         svg = string(
             abi.encodePacked(
