@@ -23,18 +23,22 @@ abstract contract NFTSVG {
 
     function generateTokenURI(SVGParams memory params) public pure returns (string memory) {
         return
-            Base64.encode(
-                bytes(
-                    string(
-                        abi.encodePacked(
-                            '{"name":"',
-                            _generateName(params),
-                            '", "description":"',
-                            _generateDescription(params),
-                            '", "image": "',
-                            "data:image/svg+xml;base64,",
-                            _generateImage(params),
-                            '"}'
+            string(
+                abi.encodePacked(
+                    "data:application/json;base64,",
+                    Base64.encode(
+                        bytes(
+                            abi.encodePacked(
+                                '{"name":"',
+                                _generateName(params),
+                                '", "description":"',
+                                _generateDescription(params),
+                                '", "image": "',
+                                "data:image/svg+xml;base64,",
+                                _generateImage(params),
+                                _generateAttributes(params),
+                                '"}'
+                            )
                         )
                     )
                 )
@@ -52,6 +56,17 @@ abstract contract NFTSVG {
                     "Lifeform storing ",
                     params.tokenBalance.toString(),
                     " tonnes of carbon from the Verra Verified Carbon Unit (VCU) registry from 2008 or later, bridged by the Toucan Protocol."
+                )
+            );
+    }
+
+    function _generateAttributes(SVGParams memory params) internal pure returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    '"attributes": [{ "trait_type": "Storage", "value": ',
+                    params.tokenBalance.toString(),
+                    " }]"
                 )
             );
     }
