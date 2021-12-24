@@ -247,6 +247,12 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     function setTokenScalar(uint256 _tokenScalar) external requiresTrust {
         tokenScalar = _tokenScalar;
 
+        for (uint256 i = 0; i < totalSupply; i++) {
+            tokenURI[i] = generateTokenURI(
+                NFTSVG.SVGParams({tokenId: i, tokenBalance: tokenBalances[i], tokenScalar: tokenScalar})
+            );
+        }
+
         emit TokenScalarUpdate(msg.sender, tokenScalar);
     }
 
