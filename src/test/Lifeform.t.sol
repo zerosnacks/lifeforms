@@ -41,6 +41,7 @@ contract LifeformTest is DSTestPlus {
     uint256 private maxSupply = 1000;
     uint256 private salePrice = 1e16;
     uint256 private tokenCap = 5e18;
+    uint256 private tokenScalar = 100;
 
     // Users
     address internal immutable self = address(this);
@@ -60,6 +61,7 @@ contract LifeformTest is DSTestPlus {
             maxSupply, // maxSupply
             salePrice, // salePrice
             tokenCap, // tokenCap
+            tokenScalar, // tokenScalar
             underlying // underlying
         );
     }
