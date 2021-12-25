@@ -9,8 +9,8 @@ import {MockERC20} from "solmate/test/utils/mocks/MockERC20.sol";
 // Contracts
 import {Lifeform} from "../Lifeform.sol";
 
-// Utilities
-import {LifeformUser} from "./abstracts/users/LifeformUser.sol";
+// Test utilities
+import {LifeformUser} from "./users/LifeformUser.sol";
 
 contract LifeformTest is DSTestPlus {
     Lifeform lifeform;
@@ -120,18 +120,31 @@ contract LifeformTest is DSTestPlus {
             assertEq(error, "NOT_APPROVED");
         }
 
-        // Then deposit underlying into token
+        // Then deposit underlying token
         usr.approveToken(10e18);
         usr.depositToken(tokenId, 10e18);
+        assertEq(lifeform.balanceOfToken(tokenId), 10e18);
 
         // Then approve an operator for the token
         usr.approve(address(operator), tokenId);
+
+        // The operator should be able to withdraw the underlying token
+        operator.withdrawToken(tokenId, 1e18);
+        assertEq(lifeform.balanceOfToken(tokenId), 9e18);
+        assertEq(underlying.balanceOf(address(operator)), 1e18);
 
         // The operator should be able to transfer the approved token
         operator.safeTransferFrom(address(usr), address(receiver), tokenId);
         assertEq(lifeform.balanceOf(address(usr)), 0);
         assertEq(lifeform.balanceOf(address(receiver)), 1);
         assertEq(lifeform.ownerOf(tokenId), address(receiver));
+
+        // The operator now should not be able to withdraw the underlying token
+        try operator.withdrawToken(tokenId, 5e18) {
+            fail();
+        } catch Error(string memory error) {
+            assertEq(error, "TOKEN_MUST_BE_OWNED");
+        }
 
         // The operator now should not be able to transfer the token again
         // since it was not approved by the current user
@@ -140,6 +153,10 @@ contract LifeformTest is DSTestPlus {
         } catch Error(string memory error) {
             assertEq(error, "NOT_APPROVED");
         }
+
+        // The new owner should be able to withdraw the underlying token
+        receiver.withdrawToken(tokenId, 5e18);
+        assertEq(underlying.balanceOf(address(receiver)), 5e18);
     }
 
     function testSafeTransferFromWithApproveForAll() public {

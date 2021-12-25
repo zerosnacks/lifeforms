@@ -5,10 +5,10 @@ pragma solidity >=0.8.0;
 import {ERC20} from "solmate/tokens/ERC20.sol";
 
 // Abstracts
-import {ERC721TokenReceiver} from "../../../abstracts/ERC721.sol";
+import {ERC721TokenReceiver} from "../../abstracts/ERC721.sol";
 
 // Contracts
-import {Lifeform} from "../../../Lifeform.sol";
+import {Lifeform} from "../../Lifeform.sol";
 
 contract LifeformUser is ERC721TokenReceiver {
     Lifeform lifeform;
@@ -22,6 +22,10 @@ contract LifeformUser is ERC721TokenReceiver {
     // ==================
     // ERC20-LIKE METHODS
     // ==================
+
+    function balanceOfToken(uint256 tokenId) public virtual returns (uint256) {
+        return lifeform.balanceOfToken(tokenId);
+    }
 
     function approveToken(uint256 underlyingAmount) public virtual returns (bool) {
         return underlying.approve(address(lifeform), underlyingAmount);

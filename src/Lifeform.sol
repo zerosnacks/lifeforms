@@ -134,6 +134,12 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     // ERC20-LIKE LOGIC
     // ================
 
+    /// @notice Read balance of token stored by token id.
+    /// @param tokenId The token id to read balance of.
+    function balanceOfToken(uint256 tokenId) external view returns (uint256) {
+        return tokenBalances[tokenId];
+    }
+
     /// @notice Approve underlying token to be spend in this contract.
     /// @param underlyingAmount The amount of the underlying tokens to approve.
     function approveToken(uint256 underlyingAmount) external whenUnpaused {

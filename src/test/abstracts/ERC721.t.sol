@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity 0.8.10;
 
+// Vendor
 import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
-import {MockERC721} from "./mocks/MockERC721.sol";
-import {ERC721User} from "./users/ERC721User.sol";
+// Test utilities
+import {MockERC721} from "../mocks/MockERC721.sol";
+import {ERC721User} from "../users/ERC721User.sol";
 
 contract ERC721Test is DSTestPlus {
     MockERC721 token;
