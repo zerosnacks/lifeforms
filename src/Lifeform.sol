@@ -101,9 +101,6 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     /// @notice Price of each minted token instance.
     uint256 public salePrice;
 
-    /// @notice Internal mapping of all token URIs.
-    mapping(uint256 => string) private tokenURIs;
-
     // =========
     // MODIFIERS
     // =========

@@ -103,12 +103,14 @@ contract LifeformTest is DSTestPlus {
     }
 
     function testSafeTransferFromWithApprove() public {
+        lifeform.flipSale();
+
         ERC721User usr = new ERC721User(lifeform);
         ERC721User receiver = new ERC721User(lifeform);
         ERC721User operator = new ERC721User(lifeform);
 
         // First mint a token
-        uint256 tokenId = lifeform.mint(address(usr));
+        uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
 
         // The operator should not be able to transfer the unapproved token
         try operator.safeTransferFrom(address(usr), address(receiver), tokenId) {
@@ -136,11 +138,14 @@ contract LifeformTest is DSTestPlus {
     }
 
     function testSafeTransferFromWithApproveForAll() public {
+        lifeform.flipSale();
+
         ERC721User usr = new ERC721User(lifeform);
         ERC721User receiver = new ERC721User(lifeform);
         ERC721User operator = new ERC721User(lifeform);
 
-        uint256 tokenId = lifeform.mint(address(usr));
+        // First mint a token
+        uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
 
         // The operator should not be able to transfer the unapproved token
         try operator.safeTransferFrom(address(usr), address(receiver), tokenId) {
