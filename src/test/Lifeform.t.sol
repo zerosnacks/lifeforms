@@ -10,27 +10,7 @@ import {MockERC20} from "solmate/test/utils/mocks/MockERC20.sol";
 import {Lifeform} from "../Lifeform.sol";
 
 // Utilities
-import {ERC721Holder} from "./utilities/ERC721Holder.sol";
-
-contract User is ERC721Holder, DSTestPlus {
-    Lifeform lifeform;
-
-    constructor(Lifeform _lifeform) {
-        lifeform = _lifeform;
-    }
-
-    function doDeposit(uint256 tokenId, uint256 underlyingAmount) public {
-        emit log_named_address("doDeposit", msg.sender);
-
-        return lifeform.deposit(tokenId, underlyingAmount);
-    }
-
-    function doWithdraw(uint256 tokenId, uint256 underlyingAmount) public {
-        emit log_named_address("doWithdraw", msg.sender);
-
-        return lifeform.withdraw(tokenId, underlyingAmount);
-    }
-}
+import {ERC721User} from "./abstracts/users/ERC721User.sol";
 
 contract LifeformTest is DSTestPlus {
     Lifeform lifeform;
@@ -45,8 +25,6 @@ contract LifeformTest is DSTestPlus {
 
     // Users
     address internal immutable self = address(this);
-    address internal immutable alice = address(new User(lifeform));
-    address internal immutable bob = address(new User(lifeform));
 
     // Proxy
     // 0x2f800db0fdb5223b3c3f354886d907a671414a7f
@@ -74,11 +52,11 @@ contract LifeformTest is DSTestPlus {
     function testMint(address usr) public {
         lifeform.flipSale();
 
-        uint256 id = lifeform.mint{value: salePrice}(usr); // Of course we have to send money with
+        uint256 tokenId = lifeform.mint{value: salePrice}(usr); // Of course we have to send money with
 
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(usr), 1);
-        assertEq(lifeform.ownerOf(id), usr);
+        assertEq(lifeform.ownerOf(tokenId), usr);
     }
 
     function testAtomicDepositWithdraw() public {
@@ -124,45 +102,68 @@ contract LifeformTest is DSTestPlus {
         emit log_named_string("TokenURI", lifeform.tokenURI(id));
     }
 
-    // function testAtomicTransfer() public {
-    //     underlying.mint(self, 10e18);
-    //     underlying.approve(address(lifeform), 10e18);
+    function testSafeTransferFromWithApprove() public {
+        ERC721User usr = new ERC721User(lifeform);
+        ERC721User receiver = new ERC721User(lifeform);
+        ERC721User operator = new ERC721User(lifeform);
 
-    //     lifeform.flipSale();
+        // First mint a token
+        uint256 tokenId = lifeform.mint(address(usr));
 
-    //     uint256 id = lifeform.mint{value: salePrice}(self);
-    //     assertEq(lifeform.totalSupply(), 1);
-    //     assertEq(lifeform.balanceOf(self), 1);
-    //     assertEq(lifeform.ownerOf(id), self);
+        // The operator should not be able to transfer the unapproved token
+        try operator.safeTransferFrom(address(usr), address(receiver), tokenId) {
+            fail();
+        } catch Error(string memory error) {
+            assertEq(error, "NOT_APPROVED");
+        }
 
-    //     lifeform.deposit(id, 1e18);
-    //     assertEq(underlying.balanceOf(self), 9e18);
+        // Then approve an operator for the token
+        usr.approve(address(operator), tokenId);
 
-    //     lifeform.safeTransferFrom(self, alice, id);
-    //     assertEq(lifeform.balanceOf(self), 0);
-    //     assertEq(lifeform.balanceOf(alice), 1);
-    //     assertEq(lifeform.ownerOf(id), alice);
-    //     assertEq(lifeform.tokenBalances(id), 1e18);
+        // The operator should be able to transfer the approved token
+        operator.safeTransferFrom(address(usr), address(receiver), tokenId);
+        assertEq(lifeform.balanceOf(address(usr)), 0);
+        assertEq(lifeform.balanceOf(address(receiver)), 1);
+        assertEq(lifeform.ownerOf(tokenId), address(receiver));
 
-    //     // TODO: Make it so you can send requests to the contract as alice
+        // The operator now should not be able to transfer the token again
+        // since it was not approved by the current user
+        try operator.safeTransferFrom(address(receiver), address(usr), tokenId) {
+            fail();
+        } catch Error(string memory error) {
+            assertEq(error, "NOT_APPROVED");
+        }
+    }
 
-    //     emit log_named_address("testAtomicTransfer", msg.sender);
+    function testSafeTransferFromWithApproveForAll() public {
+        ERC721User usr = new ERC721User(lifeform);
+        ERC721User receiver = new ERC721User(lifeform);
+        ERC721User operator = new ERC721User(lifeform);
 
-    //     assertEq(underlying.balanceOf(alice), 0);
-    //     User(alice).doWithdraw(id, 1e18);
-    //     assertEq(lifeform.tokenBalances(id), 0);
-    //     assertEq(underlying.balanceOf(alice), 1e18);
+        uint256 tokenId = lifeform.mint(address(usr));
 
-    //     underlying.mint(alice, 10e18);
-    //     underlying.approve(alice, 10e18);
-    //     User(alice).doDeposit(id, 1e18);
-    //     assertEq(lifeform.tokenBalances(id), 2e18);
+        // The operator should not be able to transfer the unapproved token
+        try operator.safeTransferFrom(address(usr), address(receiver), tokenId) {
+            fail();
+        } catch Error(string memory error) {
+            assertEq(error, "NOT_APPROVED");
+        }
 
-    //     // TODO: there is currently a problem with the access to the token balance not being transferred to the new user
+        // Then approve an operator
+        usr.setApprovalForAll(address(operator), true);
 
-    //     // alice.withdrawToken(id, 1e18);
-    //     // assertEq(underlying.balanceOf(alice), 1e18);
+        // The operator should be able to transfer any token from usr
+        operator.safeTransferFrom(address(usr), address(receiver), tokenId);
+        assertEq(lifeform.balanceOf(address(usr)), 0);
+        assertEq(lifeform.balanceOf(address(receiver)), 1);
+        assertEq(lifeform.ownerOf(tokenId), address(receiver));
 
-    //     // lifeform.safeTransferFrom(self, alice, id);
-    // }
+        // The operator now should not be able to transfer the token
+        // since it was not approved by the current user
+        try operator.safeTransferFrom(address(receiver), address(usr), tokenId) {
+            fail();
+        } catch Error(string memory error) {
+            assertEq(error, "NOT_APPROVED");
+        }
+    }
 }
