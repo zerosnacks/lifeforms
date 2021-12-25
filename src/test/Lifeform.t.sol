@@ -126,6 +126,36 @@ contract LifeformTest is DSTestPlus {
         }
     }
 
+    function testDepositWithdraw() public {
+        LifeformUser usr = new LifeformUser(lifeform, underlying);
+
+        lifeform.flipSale();
+        underlying.mint(address(usr), 10e18);
+
+        uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
+        assertEq(lifeform.totalSupply(), 1);
+        assertEq(lifeform.balanceOf(address(usr)), 1);
+        assertEq(lifeform.ownerOf(tokenId), address(usr));
+
+        usr.approveToken(10e18);
+        usr.depositToken(tokenId, 10e18);
+        assertEq(lifeform.balanceOfToken(tokenId), 10e18);
+        assertEq(underlying.balanceOf(address(usr)), 0);
+
+        // Token withdraw limit should be limited to token id balance
+        try usr.withdrawToken(tokenId, 100e18) {
+            fail();
+        } catch Error(string memory error) {
+            assertEq(error, "AMOUNT_EXCEEDS_TOKEN_ID_BALANCE");
+        }
+
+        usr.withdrawToken(tokenId, 1e18);
+        usr.withdrawToken(tokenId, 1e18);
+        usr.withdrawToken(tokenId, 1e18);
+        assertEq(lifeform.balanceOfToken(tokenId), 7e18);
+        assertEq(underlying.balanceOf(address(usr)), 3e18);
+    }
+
     function testSafeTransferFromWithApproveDepositWithdraw() public {
         LifeformUser usr = new LifeformUser(lifeform, underlying);
         LifeformUser receiver = new LifeformUser(lifeform, underlying);
