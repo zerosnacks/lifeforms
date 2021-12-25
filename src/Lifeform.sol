@@ -298,6 +298,7 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     // DESTRUCTION LOGIC
     // =================
 
+    // TODO: decide on wheter this is feasible.
     /// @notice Rescues arbitrary ERC20 tokens send to the contract by sending them to the contract owner.
     /// @dev Caller will receive any ERC20 token held as float.
     /// @param token Address of ERC20 token to rescue.
