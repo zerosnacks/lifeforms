@@ -8,6 +8,7 @@ import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 import {MockERC721} from "../mocks/MockERC721.sol";
 import {ERC721User} from "../users/ERC721User.sol";
 
+/// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/tokens/ERC721.sol)
 contract ERC721Test is DSTestPlus {
     MockERC721 token;
 
