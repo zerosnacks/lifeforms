@@ -26,12 +26,6 @@ contract LifeformTest is DSTestPlus {
     // Users
     address internal immutable self = address(this);
 
-    // Proxy
-    // 0x2f800db0fdb5223b3c3f354886d907a671414a7f
-
-    // Use Mock BCT token
-    // 0xddb857badb65657ebc766c90045403875fc29d27
-
     function setUp() public {
         underlying = new MockERC20("Mock Token", "TKN", 18);
 

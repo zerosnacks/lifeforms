@@ -10,7 +10,8 @@ import {ERC20User} from "solmate/test/utils/users/ERC20User.sol";
 // Contracts
 import {MBCT} from "../MBCT.sol";
 
-contract MockBCTTest is DSTestPlus {
+/// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/tokens/ERC721.sol)
+contract MBCTTest is DSTestPlus {
     MBCT token;
 
     function setUp() public {
