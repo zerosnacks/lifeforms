@@ -134,10 +134,16 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     // ERC20-LIKE LOGIC
     // ================
 
+    /// @notice Approve underlying token to be spend in this contract.
+    /// @param underlyingAmount The amount of the underlying tokens to approve.
+    function approveToken(uint256 underlyingAmount) external whenUnpaused {
+        UNDERLYING.approve(address(this), underlyingAmount);
+    }
+
     /// @notice Deposit a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to deposit to.
     /// @param underlyingAmount The amount of the underlying tokens to deposit.
-    function deposit(uint256 tokenId, uint256 underlyingAmount) external whenUnpaused {
+    function depositToken(uint256 tokenId, uint256 underlyingAmount) external whenUnpaused {
         // We don't allow depositing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
@@ -167,7 +173,7 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     /// @notice Withdraw a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to withdraw from.
     /// @param underlyingAmount The amount of underlying tokens to withdraw.
-    function withdraw(uint256 tokenId, uint256 underlyingAmount) external whenUnpaused {
+    function withdrawToken(uint256 tokenId, uint256 underlyingAmount) external whenUnpaused {
         // TODO: at the moment everyone is able to withdraw anyones balance to the owners account (grift)
 
         // We don't allow withdrawing 0 to prevent emitting a useless event.

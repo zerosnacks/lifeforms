@@ -10,7 +10,7 @@ import {MockERC20} from "solmate/test/utils/mocks/MockERC20.sol";
 import {Lifeform} from "../Lifeform.sol";
 
 // Utilities
-import {ERC721User} from "./abstracts/users/ERC721User.sol";
+import {LifeformUser} from "./abstracts/users/LifeformUser.sol";
 
 contract LifeformTest is DSTestPlus {
     Lifeform lifeform;
@@ -75,11 +75,11 @@ contract LifeformTest is DSTestPlus {
 
         assertEq(lifeform.tokenBalances(id), 0);
 
-        lifeform.deposit(id, 1e18);
+        lifeform.depositToken(id, 1e18);
 
         assertEq(lifeform.tokenBalances(id), 1e18);
 
-        lifeform.withdraw(id, 1e18);
+        lifeform.withdrawToken(id, 1e18);
 
         assertEq(lifeform.tokenBalances(id), 0);
         assertEq(underlying.balanceOf(self), preDepositBal);
@@ -97,17 +97,18 @@ contract LifeformTest is DSTestPlus {
 
         emit log_named_string("TokenURI", lifeform.tokenURI(id));
 
-        lifeform.deposit(id, 20e18);
+        lifeform.depositToken(id, 20e18);
 
         emit log_named_string("TokenURI", lifeform.tokenURI(id));
     }
 
     function testSafeTransferFromWithApprove() public {
-        lifeform.flipSale();
+        LifeformUser usr = new LifeformUser(lifeform, underlying);
+        LifeformUser receiver = new LifeformUser(lifeform, underlying);
+        LifeformUser operator = new LifeformUser(lifeform, underlying);
 
-        ERC721User usr = new ERC721User(lifeform);
-        ERC721User receiver = new ERC721User(lifeform);
-        ERC721User operator = new ERC721User(lifeform);
+        lifeform.flipSale();
+        underlying.mint(address(usr), 100e18);
 
         // First mint a token
         uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
@@ -118,6 +119,10 @@ contract LifeformTest is DSTestPlus {
         } catch Error(string memory error) {
             assertEq(error, "NOT_APPROVED");
         }
+
+        // Then deposit underlying into token
+        usr.approveToken(10e18);
+        usr.depositToken(tokenId, 10e18);
 
         // Then approve an operator for the token
         usr.approve(address(operator), tokenId);
@@ -140,9 +145,9 @@ contract LifeformTest is DSTestPlus {
     function testSafeTransferFromWithApproveForAll() public {
         lifeform.flipSale();
 
-        ERC721User usr = new ERC721User(lifeform);
-        ERC721User receiver = new ERC721User(lifeform);
-        ERC721User operator = new ERC721User(lifeform);
+        LifeformUser usr = new LifeformUser(lifeform, underlying);
+        LifeformUser receiver = new LifeformUser(lifeform, underlying);
+        LifeformUser operator = new LifeformUser(lifeform, underlying);
 
         // First mint a token
         uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
