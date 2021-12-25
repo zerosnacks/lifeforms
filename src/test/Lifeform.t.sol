@@ -18,7 +18,7 @@ contract LifeformTest is DSTestPlus {
 
     string private name = "Lifeform";
     string private symbol = "LIFE";
-    uint256 private maxSupply = 1000;
+    uint256 private maxSupply = 3;
     uint256 private salePrice = 1e16;
     uint256 private tokenCap = 25e18;
     uint256 private tokenScalar = 100;
@@ -49,14 +49,35 @@ contract LifeformTest is DSTestPlus {
         assertEq(lifeform.symbol(), symbol);
     }
 
-    function testMint(address usr) public {
+    function testMintCap(address usr) public {
+        try lifeform.mint{value: salePrice}(address(usr)) {
+            fail();
+        } catch Error(string memory error) {
+            assertEq(error, "SALE_NOT_ACTIVE");
+        }
+
         lifeform.flipSale();
 
-        uint256 tokenId = lifeform.mint{value: salePrice}(usr); // Of course we have to send money with
-
+        uint256 tokenId1 = lifeform.mint{value: salePrice}(usr);
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(usr), 1);
-        assertEq(lifeform.ownerOf(tokenId), usr);
+        assertEq(lifeform.ownerOf(tokenId1), usr);
+
+        uint256 tokenId2 = lifeform.mint{value: salePrice}(usr);
+        assertEq(lifeform.totalSupply(), 2);
+        assertEq(lifeform.balanceOf(usr), 2);
+        assertEq(lifeform.ownerOf(tokenId2), usr);
+
+        uint256 tokenId3 = lifeform.mint{value: salePrice}(usr);
+        assertEq(lifeform.totalSupply(), 3);
+        assertEq(lifeform.balanceOf(usr), 3);
+        assertEq(lifeform.ownerOf(tokenId3), usr);
+
+        try lifeform.mint{value: salePrice}(usr) {
+            fail();
+        } catch Error(string memory error) {
+            assertEq(error, "ALL_TOKENS_MINTED");
+        }
     }
 
     function testAtomicDepositWithdraw() public {
