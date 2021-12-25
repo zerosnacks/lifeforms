@@ -12,7 +12,6 @@ import {NFTSVG} from "./abstracts/NFTSVG.sol";
 
 /// @title Lifeform
 /// @notice Carbon bearing NFT
-/// @author Modified from LexDAO (https://github.com/lexDAO/Kali/blob/main/contracts/tokens/erc721/ERC721.sol)
 contract Lifeform is ERC721, NFTSVG, Trust {
     using SafeTransferLib for ERC20;
 
@@ -44,6 +43,12 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     /// @param user The address that updated the token total reserve cap.
     /// @param underlyingAmount The amount of underlying tokens that are allowed to be deposited.
     event TokenCapUpdate(address indexed user, uint256 underlyingAmount);
+
+    /// @notice Emitted after a succesful claim.
+    /// @param user The address that claimed the ETH.
+    /// @param to The address that the claimed ETH was transferred to.
+    /// @param amount The amount of the ETH balance that was transferred.
+    event Claim(address indexed user, address indexed to, uint256 amount);
 
     /// @notice Emitted after a succesful rescue.
     /// @param user The address that rescued the ERC20 token.
@@ -250,7 +255,11 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     /// @dev Caller will receive any ETH held as float.
     /// @param to Address to send ETH to.
     function claim(address to) external requiresTrust {
-        payable(to).transfer(address(this).balance);
+        uint256 selfBalance = address(this).balance;
+
+        payable(to).transfer(selfBalance);
+
+        emit Claim(msg.sender, to, selfBalance);
     }
 
     // =================
