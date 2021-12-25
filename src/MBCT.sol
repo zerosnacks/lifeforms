@@ -5,8 +5,12 @@ pragma solidity >=0.8.0;
 import {Trust} from "solmate/auth/Trust.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 
-contract MockBCT is ERC20, Trust {
-    constructor() ERC20("MockBCT", "MBCT", 18) Trust(msg.sender) {}
+contract MBCT is ERC20, Trust {
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        uint8 _decimals
+    ) ERC20(_name, _symbol, _decimals) Trust(msg.sender) {}
 
     function mint(address to, uint256 amount) external requiresTrust {
         _mint(to, amount);

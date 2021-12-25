@@ -4,6 +4,7 @@ pragma solidity >=0.8.0;
 // Abstracts
 import {ERC721, ERC721TokenReceiver} from "../../abstracts/ERC721.sol";
 
+/// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/tokens/ERC721.sol)
 contract ERC721User is ERC721TokenReceiver {
     ERC721 token;
 
