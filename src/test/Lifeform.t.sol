@@ -86,23 +86,47 @@ contract LifeformTest is DSTestPlus {
     }
 
     function testTokenURI() public {
-        underlying.mint(self, 100e18);
-        underlying.approve(address(lifeform), 100e18);
+        LifeformUser usr = new LifeformUser(lifeform, underlying);
+
         lifeform.flipSale();
+        underlying.mint(address(usr), 20e18);
+        usr.approveToken(20e18);
 
-        uint256 id = lifeform.mint{value: salePrice}(self);
+        uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
         assertEq(lifeform.totalSupply(), 1);
-        assertEq(lifeform.balanceOf(self), 1);
-        assertEq(lifeform.ownerOf(id), self);
+        assertEq(lifeform.balanceOf(address(usr)), 1);
+        assertEq(lifeform.ownerOf(tokenId), address(usr));
 
-        emit log_named_string("TokenURI", lifeform.tokenURI(id));
+        emit log_named_string("TokenURI", lifeform.tokenURI(tokenId));
 
-        lifeform.depositToken(id, 20e18);
+        usr.depositToken(tokenId, 20e18);
 
-        emit log_named_string("TokenURI", lifeform.tokenURI(id));
+        emit log_named_string("TokenURI", lifeform.tokenURI(tokenId));
     }
 
-    function testSafeTransferFromWithApprove() public {
+    function testTokenCap() public {
+        LifeformUser usr = new LifeformUser(lifeform, underlying);
+
+        lifeform.flipSale();
+        underlying.mint(address(usr), 100e18);
+
+        // First mint a token
+        uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
+        assertEq(lifeform.totalSupply(), 1);
+        assertEq(lifeform.balanceOf(address(usr)), 1);
+        assertEq(lifeform.ownerOf(tokenId), address(usr));
+
+        usr.approveToken(100e18);
+
+        // Token deposit should be limited to token cap
+        try usr.depositToken(tokenId, 100e18) {
+            fail();
+        } catch Error(string memory error) {
+            assertEq(error, "TOKEN_RESERVE_IS_CAPPED");
+        }
+    }
+
+    function testSafeTransferFromWithApproveDepositWithdraw() public {
         LifeformUser usr = new LifeformUser(lifeform, underlying);
         LifeformUser receiver = new LifeformUser(lifeform, underlying);
         LifeformUser operator = new LifeformUser(lifeform, underlying);
@@ -112,6 +136,9 @@ contract LifeformTest is DSTestPlus {
 
         // First mint a token
         uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
+        assertEq(lifeform.totalSupply(), 1);
+        assertEq(lifeform.balanceOf(address(usr)), 1);
+        assertEq(lifeform.ownerOf(tokenId), address(usr));
 
         // The operator should not be able to transfer the unapproved token
         try operator.safeTransferFrom(address(usr), address(receiver), tokenId) {
@@ -120,10 +147,11 @@ contract LifeformTest is DSTestPlus {
             assertEq(error, "NOT_APPROVED");
         }
 
-        // Then deposit underlying token
+        // Then owner should be able to deposit underlying token after approving
         usr.approveToken(10e18);
         usr.depositToken(tokenId, 10e18);
         assertEq(lifeform.balanceOfToken(tokenId), 10e18);
+        assertEq(underlying.balanceOf(address(usr)), 90e18);
 
         // Then approve an operator for the token
         usr.approve(address(operator), tokenId);
@@ -155,8 +183,15 @@ contract LifeformTest is DSTestPlus {
         }
 
         // The new owner should be able to withdraw the underlying token
-        receiver.withdrawToken(tokenId, 5e18);
-        assertEq(underlying.balanceOf(address(receiver)), 5e18);
+        receiver.withdrawToken(tokenId, 4e18);
+        assertEq(lifeform.balanceOfToken(tokenId), 5e18);
+        assertEq(underlying.balanceOf(address(receiver)), 4e18);
+
+        // Then new owner should be able to deposit underlying token after approving
+        receiver.approveToken(3e18);
+        receiver.depositToken(tokenId, 3e18);
+        assertEq(lifeform.balanceOfToken(tokenId), 8e18);
+        assertEq(underlying.balanceOf(address(receiver)), 1e18);
     }
 
     function testSafeTransferFromWithApproveForAll() public {
