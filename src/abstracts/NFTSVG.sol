@@ -82,23 +82,20 @@ abstract contract NFTSVG {
     }
 
     function _generateSVGDefs(SVGParams memory params) private pure returns (string memory svg) {
-        /// @notice tokenBalance has been scaled by 10**18, so say 100 * 15 = 1500
+        /// @notice tokenBalance has been scaled by 10**18, so say 250 * 10 = 2500
         uint256 scale = params.tokenScalar * params.tokenBalance;
 
         svg = string(
             abi.encodePacked(
                 "<defs>",
-                '<clipPath xmlns="http://www.w3.org/2000/svg" id="c1">',
+                '<clipPath xmlns="http://www.w3.org/2000/svg" id="a">',
                 '<rect width="600" height="600" rx="38" ry="38"/>',
                 "</clipPath>",
-                '<filter id="f1">',
-                '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.02" numOctaves="5" result="t1" seed="',
-                params.tokenId.toString(),
-                '"/>',
-                '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.005" numOctaves="5" result="t2" seed="',
+                '<filter id="b">',
+                '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.005" numOctaves="5" seed="',
                 params.tokenId.toString(),
                 '" />',
-                '<feDisplacementMap xChannelSelector="R" yChannelSelector="G" in1="t1" in2="t2" scale="',
+                '<feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="',
                 scale.toString(),
                 '" />',
                 "</filter>",
@@ -110,10 +107,10 @@ abstract contract NFTSVG {
     function _generateSVGBody() private pure returns (string memory svg) {
         svg = string(
             abi.encodePacked(
-                '<g clip-path="url(#c1)">',
-                '<rect width="600" height="600" fill="rgba(239,239,239,1.0)" />',
-                '<rect width="600" height="600" fill="none" style="filter: url(#f1)" />',
-                '<rect width="600" height="600" rx="38" ry="38" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1" />',
+                '<g clip-path="url(#a)">',
+                '<path fill="rgba(239,239,239,1.0)" d="M0 0h600v600H0z" />'
+                '<path fill="none" style="filter:url(#b)" d="M0 0h600v600H0z" />'
+                '<rect width="600" height="600" rx="38" ry="38" fill="none" stroke="rgba(0,0,0,.25)" />'
                 "</g>"
             )
         );

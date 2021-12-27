@@ -1,17 +1,16 @@
-<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <defs>
-        <clipPath xmlns="http://www.w3.org/2000/svg" id="c1">
-            <rect width="600" height="600" rx="38" ry="38"/>
-        </clipPath>
-        <filter id="f1">
-            <feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.02" numOctaves="5" result="t1" seed="5"/>
-            <feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.005" numOctaves="5" result="t2" seed="99" />
-            <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in1="t1" in2="t2" scale="1500" />
-        </filter>
-    </defs>
-    <g clip-path="url(#c1)">
-        <rect width="600" height="600" fill="rgba(239,239,239,1.0)" />
-        <rect width="600" height="600" fill="none" style="filter: url(#f1)" />
-        <rect width="600" height="600" rx="38" ry="38" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1" />
-    </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
+   <defs>
+      <clipPath id="a">
+         <rect width="600" height="600" rx="38" ry="38" />
+      </clipPath>
+      <filter id="b">
+         <feTurbulence type="fractalNoise" baseFrequency=".005" numOctaves="5" seed="99" />
+         <feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="1500" />
+      </filter>
+   </defs>
+   <g clip-path="url(#a)">
+      <path fill="rgba(239,239,239,1.0)" d="M0 0h600v600H0z" />
+      <path fill="none" style="filter:url(#b)" d="M0 0h600v600H0z" />
+      <rect width="600" height="600" rx="38" ry="38" fill="none" stroke="rgba(0,0,0,.25)" />
+   </g>
 </svg>
