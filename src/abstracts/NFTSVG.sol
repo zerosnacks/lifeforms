@@ -56,7 +56,7 @@ abstract contract NFTSVG {
                 abi.encodePacked(
                     "Lifeform storing ",
                     params.tokenBalance.toString(),
-                    " tonnes of carbon from the Verra Verified Carbon Unit (VCU) registry from 2008 or later, bridged by the Toucan Protocol."
+                    " tonne(s) of carbon from the Verra Verified Carbon Unit (VCU) registry from 2008 or later, bridged by the Toucan Protocol."
                 )
             );
     }
