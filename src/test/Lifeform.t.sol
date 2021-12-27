@@ -18,10 +18,10 @@ contract LifeformTest is DSTestPlus {
 
     string private name = "Lifeform";
     string private symbol = "LIFE";
-    uint256 private maxSupply = 3;
-    uint256 private salePrice = 1e16;
-    uint256 private tokenCap = 25e18;
-    uint256 private tokenScalar = 100;
+    uint256 private maxSupply = 100;
+    uint256 private salePrice = 10e18;
+    uint256 private tokenCap = 10e18;
+    uint256 private tokenScalar = 250;
 
     // Users
     address internal immutable self = address(this);
