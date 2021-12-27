@@ -18,7 +18,7 @@ contract LifeformLogicTest is DSTestPlus {
 
     string private name = "Lifeform";
     string private symbol = "LIFE";
-    uint256 private maxSupply = 100;
+    uint256 private maxSupply = 3;
     uint256 private salePrice = 10e18;
     uint256 private tokenCap = 10e18;
     uint256 private tokenScalar = 250;
@@ -43,13 +43,11 @@ contract LifeformLogicTest is DSTestPlus {
         assertEq(lifeform.symbol(), symbol);
     }
 
-    function testMintCap(address usr) public {
-        try lifeform.mint{value: salePrice}(address(usr)) {
-            fail();
-        } catch Error(string memory error) {
-            assertEq(error, "SALE_NOT_ACTIVE");
-        }
+    function testFailSaleNotActive(address usr) public {
+        lifeform.mint{value: salePrice}(address(usr));
+    }
 
+    function testMintCap(address usr) public {
         lifeform.flipSale();
 
         uint256 tokenId1 = lifeform.mint{value: salePrice}(usr);
@@ -104,8 +102,8 @@ contract LifeformLogicTest is DSTestPlus {
         LifeformUser usr = new LifeformUser(lifeform, underlying);
 
         lifeform.flipSale();
-        underlying.mint(address(usr), 20e18);
-        usr.approveToken(20e18);
+        underlying.mint(address(usr), 5e18);
+        usr.approveToken(5e18);
 
         uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
         assertEq(lifeform.totalSupply(), 1);
@@ -114,7 +112,7 @@ contract LifeformLogicTest is DSTestPlus {
 
         emit log_named_string("TokenURI", lifeform.tokenURI(tokenId));
 
-        usr.depositToken(tokenId, 20e18);
+        usr.depositToken(tokenId, 5e18);
 
         emit log_named_string("TokenURI", lifeform.tokenURI(tokenId));
     }
@@ -308,15 +306,15 @@ contract LifeformGasTest is DSTestPlus {
         tokenId = lifeform.mint{value: salePrice}(address(usr));
     }
 
-    function mint() public {
+    function testMint() public {
         tokenId = lifeform.mint{value: salePrice}(address(usr));
     }
 
-    function deposit() public {
+    function testDepositToken() public {
         usr.depositToken(tokenId, 5e18);
     }
 
-    function withdraw() public {
+    function testWithdrawToken() public {
         usr.withdrawToken(tokenId, 4e18);
     }
 }
