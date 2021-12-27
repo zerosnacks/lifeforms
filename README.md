@@ -6,7 +6,7 @@ Various experiments with carbon credits on chain
 
 Carbon bearing NFT, allows you to store BCT (Base Carbon Tonne) carbon credits inside of NFTs. Depending on how much you store inside compared you can change the visual result of your carbon lifeform.
 
-![Lifeform](./assets/Lifeform.png)
+![Lifeform](./assets/Lifeform.svg)
 
 ## Acknowledgements
 
