@@ -1,10 +1,18 @@
-# Carbon
+# Lifeforms
+
+Mintable research project allowing you to store 
 
 Various experiments with carbon credits on chain
 
-## Lifeform
+Carbon bearing NFT allows you to store BCT (Base Carbon Tonne) carbon credits inside of NFTs. Depending on how much you store inside compared you can change the visual result of your carbon lifeform.
 
-Carbon bearing NFT, allows you to store BCT (Base Carbon Tonne) carbon credits inside of NFTs. Depending on how much you store inside compared you can change the visual result of your carbon lifeform.
+## Why?
+
+
+
+## How?
+
+
 
 ---
 
