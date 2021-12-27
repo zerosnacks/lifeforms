@@ -12,9 +12,9 @@ import {Lifeform} from "../Lifeform.sol";
 // Test utilities
 import {LifeformUser} from "./users/LifeformUser.sol";
 
-contract LifeformTest is DSTestPlus {
-    Lifeform lifeform;
-    MockERC20 underlying;
+contract LifeformLogicTest is DSTestPlus {
+    Lifeform private lifeform;
+    MockERC20 private underlying;
 
     string private name = "Lifeform";
     string private symbol = "LIFE";
@@ -80,23 +80,23 @@ contract LifeformTest is DSTestPlus {
 
         lifeform.flipSale();
 
-        uint256 id = lifeform.mint{value: salePrice}(self);
+        uint256 tokenId = lifeform.mint{value: salePrice}(self);
 
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(self), 1);
-        assertEq(lifeform.ownerOf(id), self);
+        assertEq(lifeform.ownerOf(tokenId), self);
 
         uint256 preDepositBal = underlying.balanceOf(self);
 
-        assertEq(lifeform.tokenBalances(id), 0);
+        assertEq(lifeform.tokenBalances(tokenId), 0);
 
-        lifeform.depositToken(id, 1e18);
+        lifeform.depositToken(tokenId, 1e18);
 
-        assertEq(lifeform.tokenBalances(id), 1e18);
+        assertEq(lifeform.tokenBalances(tokenId), 1e18);
 
-        lifeform.withdrawToken(id, 1e18);
+        lifeform.withdrawToken(tokenId, 1e18);
 
-        assertEq(lifeform.tokenBalances(id), 0);
+        assertEq(lifeform.tokenBalances(tokenId), 0);
         assertEq(underlying.balanceOf(self), preDepositBal);
     }
 
@@ -272,5 +272,51 @@ contract LifeformTest is DSTestPlus {
         } catch Error(string memory error) {
             assertEq(error, "NOT_APPROVED");
         }
+    }
+}
+
+contract LifeformGasTest is DSTestPlus {
+    Lifeform private lifeform;
+    MockERC20 private underlying;
+    uint256 private tokenId;
+    LifeformUser private usr;
+
+    string private name = "Lifeform";
+    string private symbol = "LIFE";
+    uint256 private maxSupply = 100;
+    uint256 private salePrice = 10e18;
+    uint256 private tokenCap = 10e18;
+    uint256 private tokenScalar = 250;
+
+    function setUp() public {
+        underlying = new MockERC20("Mock Token", "TKN", 18);
+
+        lifeform = new Lifeform(
+            maxSupply, // maxSupply
+            salePrice, // salePrice
+            tokenCap, // tokenCap
+            tokenScalar, // tokenScalar
+            underlying // underlying
+        );
+
+        usr = new LifeformUser(lifeform, underlying);
+
+        lifeform.flipSale();
+        underlying.mint(address(usr), 20e18);
+        usr.approveToken(20e18);
+
+        tokenId = lifeform.mint{value: salePrice}(address(usr));
+    }
+
+    function mint() public {
+        tokenId = lifeform.mint{value: salePrice}(address(usr));
+    }
+
+    function deposit() public {
+        usr.depositToken(tokenId, 5e18);
+    }
+
+    function withdraw() public {
+        usr.withdrawToken(tokenId, 4e18);
     }
 }
