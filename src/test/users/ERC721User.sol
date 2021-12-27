@@ -2,10 +2,13 @@
 pragma solidity >=0.8.0;
 
 // Abstracts
-import {ERC721, ERC721TokenReceiver} from "../../abstracts/ERC721.sol";
+import {ERC721} from "../../abstracts/ERC721.sol";
+
+// Interfaces
+import {IERC721TokenReceiver} from "../../interfaces/IERC721TokenReceiver.sol";
 
 /// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/tokens/ERC721.sol)
-contract ERC721User is ERC721TokenReceiver {
+contract ERC721User is IERC721TokenReceiver {
     ERC721 token;
 
     constructor(ERC721 _token) {
@@ -18,7 +21,7 @@ contract ERC721User is ERC721TokenReceiver {
         uint256,
         bytes calldata
     ) public virtual override returns (bytes4) {
-        return ERC721TokenReceiver.onERC721Received.selector;
+        return IERC721TokenReceiver.onERC721Received.selector;
     }
 
     function approve(address spender, uint256 tokenId) public virtual {

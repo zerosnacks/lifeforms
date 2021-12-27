@@ -4,13 +4,13 @@ pragma solidity >=0.8.0;
 // Vendor
 import {ERC20} from "solmate/tokens/ERC20.sol";
 
-// Abstracts
-import {ERC721TokenReceiver} from "../../abstracts/ERC721.sol";
-
 // Contracts
 import {Lifeform} from "../../Lifeform.sol";
 
-contract LifeformUser is ERC721TokenReceiver {
+// Interfaces
+import {IERC721TokenReceiver} from "../../interfaces/IERC721TokenReceiver.sol";
+
+contract LifeformUser is IERC721TokenReceiver {
     Lifeform lifeform;
     ERC20 underlying;
 
@@ -49,7 +49,7 @@ contract LifeformUser is ERC721TokenReceiver {
         uint256,
         bytes calldata
     ) public virtual override returns (bytes4) {
-        return ERC721TokenReceiver.onERC721Received.selector;
+        return IERC721TokenReceiver.onERC721Received.selector;
     }
 
     function approve(address spender, uint256 tokenId) public virtual {

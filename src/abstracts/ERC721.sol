@@ -51,8 +51,8 @@ abstract contract ERC721 {
     // ERC-165 LOGIC
     // =============
 
-    function supportsInterface(bytes4 interfaceId) public pure virtual returns (bool supported) {
-        supported = interfaceId == 0x80ac58cd || interfaceId == 0x5b5e139f || interfaceId == 0x01ffc9a7;
+    function supportsInterface(bytes4 interfaceId) public pure virtual returns (bool) {
+        return interfaceId == 0x80ac58cd || interfaceId == 0x5b5e139f || interfaceId == 0x01ffc9a7;
     }
 
     // =============
@@ -159,13 +159,4 @@ abstract contract ERC721 {
     }
 }
 
-/// @notice A generic interface for a contract which properly accepts ERC721 tokens.
-/// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/tokens/ERC721.sol)
-interface ERC721TokenReceiver {
-    function onERC721Received(
-        address operator,
-        address from,
-        uint256 id,
-        bytes calldata data
-    ) external returns (bytes4);
-}
+
