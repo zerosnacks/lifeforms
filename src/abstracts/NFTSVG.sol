@@ -8,6 +8,8 @@ import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 import {Base64} from "../libraries/Base64.sol";
 import {Strings} from "../libraries/Strings.sol";
 
+// Only a portion of the string needs to be updated
+
 /// @title NFTSVG
 /// @notice Provides a function for generating an SVG
 /// @author Modified from Uniswap V3 (https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/NFTSVG.sol)
@@ -73,8 +75,7 @@ abstract contract NFTSVG {
                         abi.encodePacked(
                             '<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
                             _generateSVGDefs(params),
-                            _generateSVGBody(),
-                            "</svg>"
+                            '<g clip-path="url(#a)"><path fill="rgba(239,239,239,1.0)" d="M0 0h600v600H0z" /><path fill="none" style="filter:url(#b)" d="M0 0h600v600H0z" /><rect width="600" height="600" rx="38" ry="38" fill="none" stroke="rgba(0,0,0,.25)" /></g></svg>'
                         )
                     )
                 )
@@ -100,18 +101,6 @@ abstract contract NFTSVG {
                 '" />',
                 "</filter>",
                 "</defs>"
-            )
-        );
-    }
-
-    function _generateSVGBody() private pure returns (string memory svg) {
-        svg = string(
-            abi.encodePacked(
-                '<g clip-path="url(#a)">',
-                '<path fill="rgba(239,239,239,1.0)" d="M0 0h600v600H0z" />'
-                '<path fill="none" style="filter:url(#b)" d="M0 0h600v600H0z" />'
-                '<rect width="600" height="600" rx="38" ry="38" fill="none" stroke="rgba(0,0,0,.25)" />'
-                "</g>"
             )
         );
     }
