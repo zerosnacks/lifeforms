@@ -1,15 +1,15 @@
 {
-  "name": "@zerosnacks/carbon",
+  "name": "@zerosnacks/lifeforms",
   "license": "AGPL-3.0-only",
   "private": true,
   "version": "0.1.0",
-  "description": "Various experiments with carbon credits on chain",
+  "description": "Carbon bearing NFT, allows you to store BCT (Base Carbon Tonne) carbon credits inside of it.",
   "files": [
     "src/**/*.sol"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zerosnacks/carbon.git"
+    "url": "git+https://github.com/zerosnacks/lifeforms.git"
   },
   "devDependencies": {
     "prettier": "^2.3.1",
