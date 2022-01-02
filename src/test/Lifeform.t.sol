@@ -37,10 +37,6 @@ contract LifeformLogicTest is DSTestPlus {
         assertEq(lifeform.symbol(), symbol);
     }
 
-    function testFailSaleNotActive(address usr) public {
-        lifeform.mint(address(usr));
-    }
-
     function testMintCap(address usr) public {
         // Contract reverts on address(0) as it is not a valid receiver
         // For fuzzing we override this path with a valid path
