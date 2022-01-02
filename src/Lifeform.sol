@@ -60,27 +60,8 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
     /// @dev Equal to 10 ** decimals. Used for fixed point arithmetic.
     uint256 public immutable BASE_UNIT;
 
-    /// @notice Whether the sale is active.
-    bool public isSaleActive;
-
-    /// @notice Whether the contract is paused.
-    bool public isPaused;
-
     /// @notice Maximum number of token instances that can be minted on this contract.
     uint256 public maxSupply;
-
-    /// @notice Price of each minted token instance.
-    uint256 public salePrice;
-
-    // =========
-    // MODIFIERS
-    // =========
-
-    /// @dev Modifier to make a function callable only when the contract is not paused.
-    modifier whenUnpaused() {
-        require(!isPaused, "MUST_BE_UNPAUSED");
-        _;
-    }
 
     // ===========
     // CONSTRUCTOR
@@ -88,13 +69,11 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
 
     constructor(
         uint256 _maxSupply,
-        uint256 _salePrice,
         uint256 _tokenCap,
         uint256 _tokenScalar,
         ERC20 _underlying
     ) ERC721("Lifeform", "LIFE") {
         maxSupply = _maxSupply;
-        salePrice = _salePrice;
         tokenCap = _tokenCap;
         tokenScalar = _tokenScalar;
         UNDERLYING = _underlying;
@@ -113,14 +92,14 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
 
     /// @notice Approve underlying token to be spend in this contract.
     /// @param underlyingAmount The amount of the underlying tokens to approve.
-    function approveToken(uint256 underlyingAmount) external whenUnpaused {
+    function approveToken(uint256 underlyingAmount) external {
         UNDERLYING.approve(address(this), underlyingAmount);
     }
 
     /// @notice Deposit a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to deposit to.
     /// @param underlyingAmount The amount of the underlying tokens to deposit.
-    function depositToken(uint256 tokenId, uint256 underlyingAmount) external whenUnpaused {
+    function depositToken(uint256 tokenId, uint256 underlyingAmount) external {
         // We don't allow depositing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
@@ -150,7 +129,7 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
     /// @notice Withdraw a specific amount of underlying tokens from an owned token id.
     /// @param tokenId The token id to withdraw from.
     /// @param underlyingAmount The amount of underlying tokens to withdraw.
-    function withdrawToken(uint256 tokenId, uint256 underlyingAmount) external whenUnpaused {
+    function withdrawToken(uint256 tokenId, uint256 underlyingAmount) external {
         // We don't allow withdrawing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
@@ -193,10 +172,8 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
 
     /// @notice Mint token to address
     /// @param to The address to mint to.
-    function mint(address to) external payable whenUnpaused returns (uint256) {
+    function mint(address to) external payable returns (uint256) {
         require(totalSupply + 1 <= maxSupply, "ALL_TOKENS_MINTED");
-        require(isSaleActive, "SALE_NOT_ACTIVE");
-        require(salePrice <= msg.value, "INSUFFICIENT_ETHER");
 
         uint256 id = totalSupply;
 

@@ -19,7 +19,6 @@ contract LifeformLogicTest is DSTestPlus {
     string private name = "Lifeform";
     string private symbol = "LIFE";
     uint256 private maxSupply = 3;
-    uint256 private salePrice = 10e18;
     uint256 private tokenCap = 10e18;
     uint256 private tokenScalar = 250;
 
@@ -31,7 +30,6 @@ contract LifeformLogicTest is DSTestPlus {
 
         lifeform = new Lifeform(
             maxSupply, // maxSupply
-            salePrice, // salePrice
             tokenCap, // tokenCap
             tokenScalar, // tokenScalar
             underlying // underlying
@@ -44,7 +42,7 @@ contract LifeformLogicTest is DSTestPlus {
     }
 
     function testFailSaleNotActive(address usr) public {
-        lifeform.mint{value: salePrice}(address(usr));
+        lifeform.mint(address(usr));
     }
 
     function testMintCap(address usr) public {
@@ -54,24 +52,22 @@ contract LifeformLogicTest is DSTestPlus {
             usr = address(0xBEEF);
         }
 
-        lifeform.flipSale();
-
-        uint256 tokenId1 = lifeform.mint{value: salePrice}(usr);
+        uint256 tokenId1 = lifeform.mint(usr);
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(usr), 1);
         assertEq(lifeform.ownerOf(tokenId1), usr);
 
-        uint256 tokenId2 = lifeform.mint{value: salePrice}(usr);
+        uint256 tokenId2 = lifeform.mint(usr);
         assertEq(lifeform.totalSupply(), 2);
         assertEq(lifeform.balanceOf(usr), 2);
         assertEq(lifeform.ownerOf(tokenId2), usr);
 
-        uint256 tokenId3 = lifeform.mint{value: salePrice}(usr);
+        uint256 tokenId3 = lifeform.mint(usr);
         assertEq(lifeform.totalSupply(), 3);
         assertEq(lifeform.balanceOf(usr), 3);
         assertEq(lifeform.ownerOf(tokenId3), usr);
 
-        try lifeform.mint{value: salePrice}(usr) {
+        try lifeform.mint(usr) {
             fail();
         } catch Error(string memory error) {
             assertEq(error, "ALL_TOKENS_MINTED");
@@ -81,11 +77,10 @@ contract LifeformLogicTest is DSTestPlus {
     function testAtomicDepositWithdraw() public {
         LifeformUser usr = new LifeformUser(lifeform, underlying);
 
-        lifeform.flipSale();
         underlying.mint(address(usr), 10e18);
         usr.approveToken(10e18);
 
-        uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
+        uint256 tokenId = lifeform.mint(address(usr));
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(address(usr)), 1);
         assertEq(lifeform.ownerOf(tokenId), address(usr));
@@ -112,11 +107,10 @@ contract LifeformLogicTest is DSTestPlus {
     function testTokenCap() public {
         LifeformUser usr = new LifeformUser(lifeform, underlying);
 
-        lifeform.flipSale();
         underlying.mint(address(usr), 100e18);
 
         // First mint a token
-        uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
+        uint256 tokenId = lifeform.mint(address(usr));
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(address(usr)), 1);
         assertEq(lifeform.ownerOf(tokenId), address(usr));
@@ -134,10 +128,9 @@ contract LifeformLogicTest is DSTestPlus {
     function testDepositWithdraw() public {
         LifeformUser usr = new LifeformUser(lifeform, underlying);
 
-        lifeform.flipSale();
         underlying.mint(address(usr), 10e18);
 
-        uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
+        uint256 tokenId = lifeform.mint(address(usr));
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(address(usr)), 1);
         assertEq(lifeform.ownerOf(tokenId), address(usr));
@@ -166,11 +159,10 @@ contract LifeformLogicTest is DSTestPlus {
         LifeformUser receiver = new LifeformUser(lifeform, underlying);
         LifeformUser operator = new LifeformUser(lifeform, underlying);
 
-        lifeform.flipSale();
         underlying.mint(address(usr), 100e18);
 
         // First mint a token
-        uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
+        uint256 tokenId = lifeform.mint(address(usr));
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(address(usr)), 1);
         assertEq(lifeform.ownerOf(tokenId), address(usr));
@@ -230,14 +222,12 @@ contract LifeformLogicTest is DSTestPlus {
     }
 
     function testSafeTransferFromWithApproveForAll() public {
-        lifeform.flipSale();
-
         LifeformUser usr = new LifeformUser(lifeform, underlying);
         LifeformUser receiver = new LifeformUser(lifeform, underlying);
         LifeformUser operator = new LifeformUser(lifeform, underlying);
 
         // First mint a token
-        uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
+        uint256 tokenId = lifeform.mint(address(usr));
 
         // The operator should not be able to transfer the unapproved token
         try operator.safeTransferFrom(address(usr), address(receiver), tokenId) {
@@ -283,7 +273,6 @@ contract LifeformGasTest is DSTestPlus {
 
         lifeform = new Lifeform(
             maxSupply, // maxSupply
-            salePrice, // salePrice
             tokenCap, // tokenCap
             tokenScalar, // tokenScalar
             underlying // underlying
@@ -291,15 +280,14 @@ contract LifeformGasTest is DSTestPlus {
 
         usr = new LifeformUser(lifeform, underlying);
 
-        lifeform.flipSale();
         underlying.mint(address(usr), 20e18);
         usr.approveToken(20e18);
 
-        tokenId = lifeform.mint{value: salePrice}(address(usr));
+        tokenId = lifeform.mint(address(usr));
     }
 
     function testMint() public {
-        tokenId = lifeform.mint{value: salePrice}(address(usr));
+        tokenId = lifeform.mint(address(usr));
     }
 
     function testUpdateToken() public {
