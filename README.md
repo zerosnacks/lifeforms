@@ -1,6 +1,6 @@
 # Lifeforms
 
-Carbon bearing NFT allowing you to store BCT (Base Carbon Tonne) carbon credits inside of NFTs. Depending on how much you store inside compared you can change the visual result of your carbon lifeform.
+Carbon bearing NFT, allows you to store BCT (Base Carbon Tonne) carbon credits inside of it. Depending on how much you store inside compared you can change the visual result of your carbon lifeform.
 
 **THIS PROJECT IS UNAUDITED AND EXPERIMENTAL. PROCEED WITH CAUTION.**
 
