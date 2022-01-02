@@ -16,16 +16,16 @@ SOLC_VERSION := 0_8_10
 solc:; nix-env -f https://github.com/dapphub/dapptools/archive/master.tar.gz -iA solc-static-versions.solc_${SOLC_VERSION}
 
 # Build & test
-build  :; dapp build
-test   :; dapp test # --ffi # enable if you need the `ffi` cheat code on HEVM
-clean  :; dapp clean
-lint   :; yarn run lint
-gas    :; dapp check-snapshot
-estimate :; ./scripts/estimate-gas.sh ${contract}
-size   :; ./scripts/contract-size.sh ${contract}
+build:; dapp build
+test:; dapp test # --ffi # enable if you need the `ffi` cheat code on HEVM
+clean:; dapp clean
+lint:; yarn run lint
+gas:; dapp check-snapshot
+estimate:; ./scripts/estimate-gas.sh ${contract}
+size:; ./scripts/contract-size.sh ${contract}
 
 # Deployment helpers
-deploy :; @./scripts/deploy.sh
+deploy:; @./scripts/deploy.sh
 
 # polygon
 deploy-polygon: export ETH_RPC_URL = $(call polygon_network,mainnet)
@@ -36,7 +36,7 @@ deploy-rinkeby: export ETH_RPC_URL = $(call eth_network,rinkeby)
 deploy-rinkeby: check-api-key deploy
 
 # verify on Polygonscan
-verify:; ETH_RPC_URL=$(call polygon_network,mainnet) dapp verify-contract src/Lifeform.sol:Lifeform $(contract_address)
+verify:; ETH_RPC_URL=$(call polygon_network,mainnet) dapp verify-contract src/Lifeform.sol:Lifeform $(contract)
 
 check-api-key:
 ifndef ALCHEMY_API_KEY
