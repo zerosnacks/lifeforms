@@ -287,17 +287,6 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
         emit Claim(msg.sender, to, selfBalance);
     }
 
-    // =================
-    // DESTRUCTION LOGIC
-    // =================
-
-    // TODO: remove before launch !!
-    /// @notice Self destructs, enabling it to be redeployed.
-    /// @dev Caller will receive any ETH held as float.
-    function destroy() external onlyOwner {
-        selfdestruct(payable(msg.sender));
-    }
-
     // ===================
     // RECIEVE ETHER LOGIC
     // ===================
