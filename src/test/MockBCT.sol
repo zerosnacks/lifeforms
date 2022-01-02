@@ -8,18 +8,18 @@ import {MockERC20} from "solmate/test/utils/mocks/MockERC20.sol";
 import {ERC20User} from "solmate/test/utils/users/ERC20User.sol";
 
 // Contracts
-import {MBCT} from "../MBCT.sol";
+import {MockBCT} from "../MockBCT.sol";
 
 /// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/tokens/ERC20.sol)
-contract MBCTTest is DSTestPlus {
-    MBCT token;
+contract MockBCTTest is DSTestPlus {
+    MockBCT token;
 
     function setUp() public {
-        token = new MBCT("MBCT", "MBCT", 18);
+        token = new MockBCT("MockBCT", "MBCT", 18);
     }
 
     function invariantMetadata() public {
-        assertEq(token.name(), "MBCT");
+        assertEq(token.name(), "MockBCT");
         assertEq(token.symbol(), "MBCT");
         assertEq(token.decimals(), 18);
     }
@@ -134,10 +134,10 @@ contract MBCTTest is DSTestPlus {
 
 contract ERC20Invariants is DSTestPlus, DSInvariantTest {
     BalanceSum balanceSum;
-    MBCT token;
+    MockBCT token;
 
     function setUp() public {
-        token = new MBCT("MBCT", "MBCT", 18);
+        token = new MockBCT("MBCT", "MBCT", 18);
         balanceSum = new BalanceSum(token);
 
         addTargetContract(address(balanceSum));
@@ -149,10 +149,10 @@ contract ERC20Invariants is DSTestPlus, DSInvariantTest {
 }
 
 contract BalanceSum {
-    MBCT token;
+    MockBCT token;
     uint256 public sum;
 
-    constructor(MBCT _token) {
+    constructor(MockBCT _token) {
         token = _token;
     }
 

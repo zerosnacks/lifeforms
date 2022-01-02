@@ -7,7 +7,7 @@ import {ERC20} from "solmate/tokens/ERC20.sol";
 // Abstract
 import {Ownable} from "./abstracts/Ownable.sol";
 
-contract MBCT is ERC20, Ownable {
+contract MockBCT is ERC20, Ownable {
     constructor(
         string memory _name,
         string memory _symbol,
