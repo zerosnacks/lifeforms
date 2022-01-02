@@ -48,6 +48,12 @@ contract LifeformLogicTest is DSTestPlus {
     }
 
     function testMintCap(address usr) public {
+        // Contract reverts on address(0) as it is not a valid receiver
+        // For fuzzing we override this path with a valid path
+        if (usr == address(0)) {
+            usr = address(0xBEEF);
+        }
+
         lifeform.flipSale();
 
         uint256 tokenId1 = lifeform.mint{value: salePrice}(usr);
