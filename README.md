@@ -2,6 +2,8 @@
 
 Carbon bearing NFT - stores [BCT (Base Carbon Tonne)](https://toucan.earth/) carbon credits inside of NFTs. The more BCT you store inside the more you improve the visual fidelity of your carbon lifeform.
 
+![Lifeform progression](./assets/1.png)
+
 **THIS PROJECT IS A PROOF OF CONCEPT, UNAUDITED AND EXPERIMENTAL. PROCEED WITH CAUTION.**
 
 ## Overview
@@ -20,7 +22,7 @@ A `Lifeform` with 0 BCT deposited
 
 A `Lifeform` with 1500 BCT deposited
 
-![Lifeform 6 BCT](./assets/99-1500.svg)
+![Lifeform 1500 BCT](./assets/99-1500.svg)
 
 This on-chain demand is directly reflected - be it on a micro-scale - in the real world. If the price of BCT goes up the traditional off-chain carbon credit market is incentivised to permanently retire more of their carbon credits and bring them on chain. This in turn creates more demand for projects in the real world to be developed that bring forth these carbon credits.
 
@@ -29,8 +31,6 @@ This on-chain demand is directly reflected - be it on a micro-scale - in the rea
 After approving with `approveToken` users deposit BCT tokens into the `Lifeform` contract address using `depositToken`. Internally a balance is tied to the `tokenId` instead of the address the user deposited the tokens with. When the NFT is transferred the `tokenBalance` remains tied to the `tokenId` meaning the BCT tokens remain tied to the NFT, not the depositor. If the user desires they can withdraw their deposited BCT tokens at any time using the `withdrawToken` method except after the NFT itself has been transferred already. This will in turn update the token to reflect its current balance with the according level of visual fidelity.
 
 The artwork is composed as an on-chain `SVG` on mint and is dynamically updated to reflect the current BCT balance of the NFT whenever the user deposits into or withdraws BCT tokens from the NFT.
-
-![Lifeform progression](./assets/1.png)
 
 ## Acknowledgements
 
