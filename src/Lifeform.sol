@@ -288,7 +288,7 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
     }
 
     // ===================
-    // RECIEVE ETHER LOGIC
+    // RECEIVE ETHER LOGIC
     // ===================
 
     /// @dev Required for the contract to receive unwrapped ETH.
