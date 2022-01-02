@@ -73,48 +73,34 @@ contract LifeformLogicTest is DSTestPlus {
     }
 
     function testAtomicDepositWithdraw() public {
-        underlying.mint(self, 10e18);
-        underlying.approve(address(lifeform), 10e18);
-
-        lifeform.flipSale();
-
-        uint256 tokenId = lifeform.mint{value: salePrice}(self);
-
-        assertEq(lifeform.totalSupply(), 1);
-        assertEq(lifeform.balanceOf(self), 1);
-        assertEq(lifeform.ownerOf(tokenId), self);
-
-        uint256 preDepositBal = underlying.balanceOf(self);
-
-        assertEq(lifeform.tokenBalances(tokenId), 0);
-
-        lifeform.depositToken(tokenId, 1e18);
-
-        assertEq(lifeform.tokenBalances(tokenId), 1e18);
-
-        lifeform.withdrawToken(tokenId, 1e18);
-
-        assertEq(lifeform.tokenBalances(tokenId), 0);
-        assertEq(underlying.balanceOf(self), preDepositBal);
-    }
-
-    function testTokenURI() public {
         LifeformUser usr = new LifeformUser(lifeform, underlying);
 
         lifeform.flipSale();
-        underlying.mint(address(usr), 5e18);
-        usr.approveToken(5e18);
+        underlying.mint(address(usr), 10e18);
+        usr.approveToken(10e18);
 
         uint256 tokenId = lifeform.mint{value: salePrice}(address(usr));
         assertEq(lifeform.totalSupply(), 1);
         assertEq(lifeform.balanceOf(address(usr)), 1);
         assertEq(lifeform.ownerOf(tokenId), address(usr));
 
-        emit log_named_string("TokenURI", lifeform.tokenURI(tokenId));
+        uint256 preDepositBal = underlying.balanceOf(address(usr));
 
-        usr.depositToken(tokenId, 5e18);
+        assertEq(lifeform.tokenBalances(tokenId), 0);
 
-        emit log_named_string("TokenURI", lifeform.tokenURI(tokenId));
+        emit log_named_string("TokenURI 0", lifeform.tokenURI(tokenId));
+
+        usr.depositToken(tokenId, 1e18);
+        assertEq(lifeform.tokenBalances(tokenId), 1e18);
+
+        emit log_named_string("TokenURI 1", lifeform.tokenURI(tokenId));
+
+        usr.withdrawToken(tokenId, 1e18);
+        assertEq(lifeform.tokenBalances(tokenId), 0);
+
+        emit log_named_string("TokenURI 0", lifeform.tokenURI(tokenId));
+
+        assertEq(underlying.balanceOf(address(usr)), preDepositBal);
     }
 
     function testTokenCap() public {
@@ -187,7 +173,7 @@ contract LifeformLogicTest is DSTestPlus {
         try operator.safeTransferFrom(address(usr), address(receiver), tokenId) {
             fail();
         } catch Error(string memory error) {
-            assertEq(error, "NOT_APPROVED");
+            assertEq(error, "NOT_AUTHORIZED");
         }
 
         // Then owner should be able to deposit underlying token after approving
@@ -222,7 +208,7 @@ contract LifeformLogicTest is DSTestPlus {
         try operator.safeTransferFrom(address(receiver), address(usr), tokenId) {
             fail();
         } catch Error(string memory error) {
-            assertEq(error, "NOT_APPROVED");
+            assertEq(error, "NOT_AUTHORIZED");
         }
 
         // The new owner should be able to withdraw the underlying token
@@ -251,7 +237,7 @@ contract LifeformLogicTest is DSTestPlus {
         try operator.safeTransferFrom(address(usr), address(receiver), tokenId) {
             fail();
         } catch Error(string memory error) {
-            assertEq(error, "NOT_APPROVED");
+            assertEq(error, "NOT_AUTHORIZED");
         }
 
         // Then approve an operator
@@ -268,7 +254,7 @@ contract LifeformLogicTest is DSTestPlus {
         try operator.safeTransferFrom(address(receiver), address(usr), tokenId) {
             fail();
         } catch Error(string memory error) {
-            assertEq(error, "NOT_APPROVED");
+            assertEq(error, "NOT_AUTHORIZED");
         }
     }
 }
@@ -315,6 +301,7 @@ contract LifeformGasTest is DSTestPlus {
     }
 
     function testWithdrawToken() public {
+        usr.depositToken(tokenId, 5e18);
         usr.withdrawToken(tokenId, 4e18);
     }
 }
