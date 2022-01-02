@@ -8,8 +8,6 @@ import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 import {Base64} from "../libraries/Base64.sol";
 import {Strings} from "../libraries/Strings.sol";
 
-// TODO: Only a portion of the string needs to be updated, perhaps we can just update that part
-
 /// @notice Provides a function for generating an SVG
 /// @author Modified from Uniswap V3 (https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/NFTSVG.sol)
 abstract contract NFTSVG {
@@ -19,7 +17,6 @@ abstract contract NFTSVG {
     struct SVGParams {
         uint256 tokenId;
         uint256 tokenBalance;
-        uint256 tokenScalar;
     }
 
     function generateTokenURI(SVGParams memory params) public pure returns (string memory) {
@@ -83,7 +80,7 @@ abstract contract NFTSVG {
 
     function _generateSVGDefs(SVGParams memory params) private pure returns (string memory svg) {
         /// @notice tokenBalance has been scaled by 10**18, so say 250 * 10 = 2500
-        uint256 scale = params.tokenScalar * params.tokenBalance;
+        uint256 scale = 250 * params.tokenBalance;
 
         svg = string(
             abi.encodePacked(

@@ -9,11 +9,10 @@ import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 // Abstracts
 import {ERC721} from "./abstracts/ERC721.sol";
 import {NFTSVG} from "./abstracts/NFTSVG.sol";
-import {Ownable} from "./abstracts/Ownable.sol";
 
 /// @title Lifeform
 /// @notice Carbon bearing NFT allowing users to store BCT (Base Carbon Tonne) carbon credits inside of NFTs
-contract Lifeform is ERC721, NFTSVG, Ownable {
+contract Lifeform is ERC721, NFTSVG {
     using SafeTransferLib for ERC20;
     using FixedPointMathLib for uint256;
 
@@ -40,12 +39,6 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
     /// @notice Tracks the total amount of underlying tokens deposited.
     uint256 public tokenTotalReserve;
 
-    /// @notice Caps the amount of underlying tokens that are allowed to be deposited per token.
-    uint256 public tokenCap;
-
-    /// @notice The amount of effect that the deposited underlying tokens have the visual image.
-    uint256 public tokenScalar;
-
     /// @notice Mapping of underlying token balances.
     mapping(uint256 => uint256) public tokenBalances;
 
@@ -67,15 +60,8 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
     // CONSTRUCTOR
     // ===========
 
-    constructor(
-        uint256 _maxSupply,
-        uint256 _tokenCap,
-        uint256 _tokenScalar,
-        ERC20 _underlying
-    ) ERC721("Lifeform", "LIFE") {
+    constructor(uint256 _maxSupply, ERC20 _underlying) ERC721("Lifeform", "LIFE") {
         maxSupply = _maxSupply;
-        tokenCap = _tokenCap;
-        tokenScalar = _tokenScalar;
         UNDERLYING = _underlying;
         BASE_UNIT = 10**_underlying.decimals();
     }
@@ -103,7 +89,6 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
         // We don't allow depositing 0 to prevent emitting a useless event.
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
-        require(tokenBalances[tokenId] + underlyingAmount <= tokenCap, "TOKEN_RESERVE_IS_CAPPED");
 
         // Transfer the provided amount of underlying tokens from msg.sender to this contract.
         UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
@@ -116,11 +101,7 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
         }
 
         tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({
-                tokenId: tokenId,
-                tokenBalance: tokenBalances[tokenId] / BASE_UNIT,
-                tokenScalar: tokenScalar
-            })
+            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
 
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
@@ -146,11 +127,7 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
         UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
 
         tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({
-                tokenId: tokenId,
-                tokenBalance: tokenBalances[tokenId] / BASE_UNIT,
-                tokenScalar: tokenScalar
-            })
+            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
@@ -179,7 +156,7 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
 
         _safeMint(to, id);
 
-        tokenURI[id] = generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0, tokenScalar: tokenScalar}));
+        tokenURI[id] = generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0}));
 
         return id;
     }
