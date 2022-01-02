@@ -91,7 +91,6 @@ contract LifeformLogicTest is DSTestPlus {
 
         usr.withdrawToken(tokenId, 5e18);
         assertEq(lifeform.tokenBalances(tokenId), 0);
-        assertEq(underlying.balanceOf(address(usr)), 10e18);
 
         emit log_named_string("TokenURI 0 BCT", lifeform.tokenURI(tokenId));
 
