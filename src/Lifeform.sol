@@ -2,7 +2,6 @@
 pragma solidity >=0.8.0;
 
 // Vendor
-import {Trust} from "solmate/auth/Trust.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
@@ -10,10 +9,11 @@ import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 // Abstracts
 import {ERC721} from "./abstracts/ERC721.sol";
 import {NFTSVG} from "./abstracts/NFTSVG.sol";
+import {Ownable} from "./abstracts/Ownable.sol";
 
 /// @title Lifeform
 /// @notice Carbon bearing NFT
-contract Lifeform is ERC721, NFTSVG, Trust {
+contract Lifeform is ERC721, NFTSVG, Ownable {
     using SafeTransferLib for ERC20;
     using FixedPointMathLib for uint256;
 
@@ -121,7 +121,7 @@ contract Lifeform is ERC721, NFTSVG, Trust {
         uint256 _tokenCap,
         uint256 _tokenScalar,
         ERC20 _underlying
-    ) ERC721("Lifeform", "LIFE") Trust(msg.sender) {
+    ) ERC721("Lifeform", "LIFE") {
         maxSupply = _maxSupply;
         salePrice = _salePrice;
         tokenCap = _tokenCap;
@@ -229,23 +229,9 @@ contract Lifeform is ERC721, NFTSVG, Trust {
 
         uint256 id = totalSupply;
 
-        // There should not be any way this is true as used cannot control token id.
-        require(ownerOf[id] == address(0), "ALREADY_MINTED");
-
-        // this is reasonably safe from overflow because incrementing `totalSupply` beyond
-        // 'type(uint256).max' is exceedingly unlikely compared to optimization benefits,
-        // and because the sum of all user balances can't exceed 'type(uint256).max'
-        unchecked {
-            totalSupply++;
-
-            balanceOf[to]++;
-        }
-
-        ownerOf[id] = to;
+        _safeMint(to, id);
 
         tokenURI[id] = generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0, tokenScalar: tokenScalar}));
-
-        emit Transfer(address(0), to, id);
 
         return id;
     }
@@ -256,7 +242,7 @@ contract Lifeform is ERC721, NFTSVG, Trust {
 
     /// @notice Sets the token scalar.
     /// @param _tokenScalar The amount of effect that the deposited underlying tokens have the visual image.
-    function setTokenScalar(uint256 _tokenScalar) external requiresTrust {
+    function setTokenScalar(uint256 _tokenScalar) external onlyOwner {
         tokenScalar = _tokenScalar;
 
         for (uint256 i = 0; i < totalSupply; i++) {
@@ -270,21 +256,21 @@ contract Lifeform is ERC721, NFTSVG, Trust {
 
     /// @notice Sets the token reserve cap.
     /// @param _tokenCap The token amount allowed to be deposited per token id.
-    function setTokenCap(uint256 _tokenCap) external requiresTrust {
+    function setTokenCap(uint256 _tokenCap) external onlyOwner {
         tokenCap = _tokenCap;
 
         emit TokenCapUpdate(msg.sender, tokenCap);
     }
 
     /// @notice Flips to paused or unpaused.
-    function flipPause() external requiresTrust {
+    function flipPause() external onlyOwner {
         isPaused = !isPaused;
 
         emit Paused(msg.sender, isPaused);
     }
 
     /// @notice Flips to active or inactive.
-    function flipSale() external requiresTrust {
+    function flipSale() external onlyOwner {
         isSaleActive = !isSaleActive;
 
         emit SaleActive(msg.sender, isSaleActive);
@@ -293,7 +279,7 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     /// @notice Claim all received funds.
     /// @dev Caller will receive any ETH held as float.
     /// @param to Address to send ETH to.
-    function claim(address to) external requiresTrust {
+    function claim(address to) external onlyOwner {
         uint256 selfBalance = address(this).balance;
 
         payable(to).transfer(selfBalance);
@@ -308,7 +294,7 @@ contract Lifeform is ERC721, NFTSVG, Trust {
     // TODO: remove before launch !!
     /// @notice Self destructs, enabling it to be redeployed.
     /// @dev Caller will receive any ETH held as float.
-    function destroy() external requiresTrust {
+    function destroy() external onlyOwner {
         selfdestruct(payable(msg.sender));
     }
 

@@ -3,12 +3,10 @@ pragma solidity >=0.8.0;
 
 // Vendor
 import {ERC20} from "solmate/tokens/ERC20.sol";
+import {ERC721TokenReceiver} from "solmate/tokens/ERC721.sol";
 
 // Contracts
 import {Lifeform} from "../../Lifeform.sol";
-
-// Interfaces
-import {IERC721TokenReceiver} from "../../interfaces/IERC721TokenReceiver.sol";
 
 contract LifeformUser is IERC721TokenReceiver {
     Lifeform lifeform;
