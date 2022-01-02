@@ -60,7 +60,7 @@ contract Lifeform is ERC721, NFTSVG {
     // CONSTRUCTOR
     // ===========
 
-    constructor(uint256 _maxSupply, ERC20 _underlying) ERC721("Carbon Lifeform", "CLIFE") {
+    constructor(uint256 _maxSupply, ERC20 _underlying) ERC721("Lifeforms", "LIFE") {
         maxSupply = _maxSupply;
         UNDERLYING = _underlying;
         BASE_UNIT = 10**_underlying.decimals();
