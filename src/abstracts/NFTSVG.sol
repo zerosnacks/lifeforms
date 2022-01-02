@@ -8,7 +8,7 @@ import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 import {Base64} from "../libraries/Base64.sol";
 import {Strings} from "../libraries/Strings.sol";
 
-// Only a portion of the string needs to be updated
+// TODO: Only a portion of the string needs to be updated, perhaps we can just update that part
 
 /// @title NFTSVG
 /// @notice Provides a function for generating an SVG
