@@ -8,7 +8,7 @@ import {ERC721TokenReceiver} from "solmate/tokens/ERC721.sol";
 // Contracts
 import {Lifeform} from "../../Lifeform.sol";
 
-contract LifeformUser is IERC721TokenReceiver {
+contract LifeformUser is ERC721TokenReceiver {
     Lifeform lifeform;
     ERC20 underlying;
 
@@ -47,7 +47,7 @@ contract LifeformUser is IERC721TokenReceiver {
         uint256,
         bytes calldata
     ) public virtual override returns (bytes4) {
-        return IERC721TokenReceiver.onERC721Received.selector;
+        return ERC721TokenReceiver.onERC721Received.selector;
     }
 
     function approve(address spender, uint256 tokenId) public virtual {
