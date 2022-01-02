@@ -6,14 +6,14 @@ import {ERC20} from "solmate/tokens/ERC20.sol";
 import {ERC721TokenReceiver} from "solmate/tokens/ERC721.sol";
 
 // Contracts
-import {Lifeform} from "../../Lifeform.sol";
+import {Lifeforms} from "../../Lifeforms.sol";
 
-contract LifeformUser is ERC721TokenReceiver {
-    Lifeform lifeform;
+contract LifeformsUser is ERC721TokenReceiver {
+    Lifeforms lifeforms;
     ERC20 underlying;
 
-    constructor(Lifeform _lifeform, ERC20 _underlying) {
-        lifeform = _lifeform;
+    constructor(Lifeforms _lifeforms, ERC20 _underlying) {
+        lifeforms = _lifeforms;
         underlying = _underlying;
     }
 
@@ -22,19 +22,19 @@ contract LifeformUser is ERC721TokenReceiver {
     // ==================
 
     function balanceOfToken(uint256 tokenId) public virtual returns (uint256) {
-        return lifeform.balanceOfToken(tokenId);
+        return lifeforms.balanceOfToken(tokenId);
     }
 
     function approveToken(uint256 underlyingAmount) public virtual returns (bool) {
-        return underlying.approve(address(lifeform), underlyingAmount);
+        return underlying.approve(address(lifeforms), underlyingAmount);
     }
 
     function depositToken(uint256 tokenId, uint256 underlyingAmount) public virtual {
-        lifeform.depositToken(tokenId, underlyingAmount);
+        lifeforms.depositToken(tokenId, underlyingAmount);
     }
 
     function withdrawToken(uint256 tokenId, uint256 underlyingAmount) public virtual {
-        lifeform.withdrawToken(tokenId, underlyingAmount);
+        lifeforms.withdrawToken(tokenId, underlyingAmount);
     }
 
     // ==============
@@ -51,11 +51,11 @@ contract LifeformUser is ERC721TokenReceiver {
     }
 
     function approve(address spender, uint256 tokenId) public virtual {
-        lifeform.approve(spender, tokenId);
+        lifeforms.approve(spender, tokenId);
     }
 
     function setApprovalForAll(address operator, bool approved) public virtual {
-        lifeform.setApprovalForAll(operator, approved);
+        lifeforms.setApprovalForAll(operator, approved);
     }
 
     function transferFrom(
@@ -63,7 +63,7 @@ contract LifeformUser is ERC721TokenReceiver {
         address to,
         uint256 tokenId
     ) public virtual {
-        lifeform.transferFrom(from, to, tokenId);
+        lifeforms.transferFrom(from, to, tokenId);
     }
 
     function safeTransferFrom(
@@ -71,7 +71,7 @@ contract LifeformUser is ERC721TokenReceiver {
         address to,
         uint256 tokenId
     ) public virtual {
-        lifeform.safeTransferFrom(from, to, tokenId);
+        lifeforms.safeTransferFrom(from, to, tokenId);
     }
 
     function safeTransferFrom(
@@ -80,6 +80,6 @@ contract LifeformUser is ERC721TokenReceiver {
         uint256 tokenId,
         bytes memory data
     ) public {
-        lifeform.safeTransferFrom(from, to, tokenId, data);
+        lifeforms.safeTransferFrom(from, to, tokenId, data);
     }
 }

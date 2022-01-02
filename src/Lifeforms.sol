@@ -10,9 +10,9 @@ import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 import {ERC721} from "./abstracts/ERC721.sol";
 import {NFTSVG} from "./abstracts/NFTSVG.sol";
 
-/// @title Lifeform
+/// @title Lifeforms
 /// @notice Carbon bearing NFT allowing users to store BCT (Base Carbon Tonne) carbon credits inside of NFTs
-contract Lifeform is ERC721, NFTSVG {
+contract Lifeforms is ERC721, NFTSVG {
     using SafeTransferLib for ERC20;
     using FixedPointMathLib for uint256;
 

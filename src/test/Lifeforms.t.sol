@@ -7,13 +7,13 @@ import {ERC20} from "solmate/tokens/ERC20.sol";
 import {MockERC20} from "solmate/test/utils/mocks/MockERC20.sol";
 
 // Contracts
-import {Lifeform} from "../Lifeform.sol";
+import {Lifeforms} from "../Lifeforms.sol";
 
 // Test utilities
-import {LifeformUser} from "./users/LifeformUser.sol";
+import {LifeformsUser} from "./users/LifeformsUser.sol";
 
 contract LifeformLogicTest is DSTestPlus {
-    Lifeform private lifeform;
+    Lifeforms private lifeforms;
     MockERC20 private underlying;
 
     string private name = "Lifeforms";
@@ -26,15 +26,15 @@ contract LifeformLogicTest is DSTestPlus {
     function setUp() public {
         underlying = new MockERC20("Mock Token", "TKN", 18);
 
-        lifeform = new Lifeform(
+        lifeforms = new Lifeforms(
             maxSupply, // maxSupply
             underlying // underlying
         );
     }
 
     function invariantMetadata() public {
-        assertEq(lifeform.name(), name);
-        assertEq(lifeform.symbol(), symbol);
+        assertEq(lifeforms.name(), name);
+        assertEq(lifeforms.symbol(), symbol);
     }
 
     function testMintCap(address usr) public {
@@ -44,22 +44,22 @@ contract LifeformLogicTest is DSTestPlus {
             usr = address(0xBEEF);
         }
 
-        uint256 tokenId1 = lifeform.mint(usr);
-        assertEq(lifeform.totalSupply(), 1);
-        assertEq(lifeform.balanceOf(usr), 1);
-        assertEq(lifeform.ownerOf(tokenId1), usr);
+        uint256 tokenId1 = lifeforms.mint(usr);
+        assertEq(lifeforms.totalSupply(), 1);
+        assertEq(lifeforms.balanceOf(usr), 1);
+        assertEq(lifeforms.ownerOf(tokenId1), usr);
 
-        uint256 tokenId2 = lifeform.mint(usr);
-        assertEq(lifeform.totalSupply(), 2);
-        assertEq(lifeform.balanceOf(usr), 2);
-        assertEq(lifeform.ownerOf(tokenId2), usr);
+        uint256 tokenId2 = lifeforms.mint(usr);
+        assertEq(lifeforms.totalSupply(), 2);
+        assertEq(lifeforms.balanceOf(usr), 2);
+        assertEq(lifeforms.ownerOf(tokenId2), usr);
 
-        uint256 tokenId3 = lifeform.mint(usr);
-        assertEq(lifeform.totalSupply(), 3);
-        assertEq(lifeform.balanceOf(usr), 3);
-        assertEq(lifeform.ownerOf(tokenId3), usr);
+        uint256 tokenId3 = lifeforms.mint(usr);
+        assertEq(lifeforms.totalSupply(), 3);
+        assertEq(lifeforms.balanceOf(usr), 3);
+        assertEq(lifeforms.ownerOf(tokenId3), usr);
 
-        try lifeform.mint(usr) {
+        try lifeforms.mint(usr) {
             fail();
         } catch Error(string memory error) {
             assertEq(error, "ALL_TOKENS_MINTED");
@@ -67,49 +67,49 @@ contract LifeformLogicTest is DSTestPlus {
     }
 
     function testAtomicDepositWithdraw() public {
-        LifeformUser usr = new LifeformUser(lifeform, underlying);
+        LifeformsUser usr = new LifeformsUser(lifeforms, underlying);
 
         underlying.mint(address(usr), 10e18);
         usr.approveToken(10e18);
 
-        uint256 tokenId = lifeform.mint(address(usr));
-        assertEq(lifeform.totalSupply(), 1);
-        assertEq(lifeform.balanceOf(address(usr)), 1);
-        assertEq(lifeform.ownerOf(tokenId), address(usr));
+        uint256 tokenId = lifeforms.mint(address(usr));
+        assertEq(lifeforms.totalSupply(), 1);
+        assertEq(lifeforms.balanceOf(address(usr)), 1);
+        assertEq(lifeforms.ownerOf(tokenId), address(usr));
 
         uint256 preDepositBal = underlying.balanceOf(address(usr));
 
-        assertEq(lifeform.tokenBalances(tokenId), 0);
+        assertEq(lifeforms.tokenBalances(tokenId), 0);
 
-        emit log_named_string("TokenURI 0 BCT", lifeform.tokenURI(tokenId));
+        emit log_named_string("TokenURI 0 BCT", lifeforms.tokenURI(tokenId));
 
         usr.depositToken(tokenId, 5e18);
-        assertEq(lifeform.tokenBalances(tokenId), 5e18);
+        assertEq(lifeforms.tokenBalances(tokenId), 5e18);
         assertEq(underlying.balanceOf(address(usr)), 5e18);
 
-        emit log_named_string("TokenURI 5 BCT", lifeform.tokenURI(tokenId));
+        emit log_named_string("TokenURI 5 BCT", lifeforms.tokenURI(tokenId));
 
         usr.withdrawToken(tokenId, 5e18);
-        assertEq(lifeform.tokenBalances(tokenId), 0);
+        assertEq(lifeforms.tokenBalances(tokenId), 0);
 
-        emit log_named_string("TokenURI 0 BCT", lifeform.tokenURI(tokenId));
+        emit log_named_string("TokenURI 0 BCT", lifeforms.tokenURI(tokenId));
 
         assertEq(underlying.balanceOf(address(usr)), preDepositBal);
     }
 
     function testDepositWithdraw() public {
-        LifeformUser usr = new LifeformUser(lifeform, underlying);
+        LifeformsUser usr = new LifeformsUser(lifeforms, underlying);
 
         underlying.mint(address(usr), 10e18);
 
-        uint256 tokenId = lifeform.mint(address(usr));
-        assertEq(lifeform.totalSupply(), 1);
-        assertEq(lifeform.balanceOf(address(usr)), 1);
-        assertEq(lifeform.ownerOf(tokenId), address(usr));
+        uint256 tokenId = lifeforms.mint(address(usr));
+        assertEq(lifeforms.totalSupply(), 1);
+        assertEq(lifeforms.balanceOf(address(usr)), 1);
+        assertEq(lifeforms.ownerOf(tokenId), address(usr));
 
         usr.approveToken(10e18);
         usr.depositToken(tokenId, 10e18);
-        assertEq(lifeform.balanceOfToken(tokenId), 10e18);
+        assertEq(lifeforms.balanceOfToken(tokenId), 10e18);
         assertEq(underlying.balanceOf(address(usr)), 0);
 
         // Token withdraw limit should be limited to token id balance
@@ -122,22 +122,22 @@ contract LifeformLogicTest is DSTestPlus {
         usr.withdrawToken(tokenId, 1e18);
         usr.withdrawToken(tokenId, 1e18);
         usr.withdrawToken(tokenId, 1e18);
-        assertEq(lifeform.balanceOfToken(tokenId), 7e18);
+        assertEq(lifeforms.balanceOfToken(tokenId), 7e18);
         assertEq(underlying.balanceOf(address(usr)), 3e18);
     }
 
     function testSafeTransferFromWithApproveDepositWithdraw() public {
-        LifeformUser usr = new LifeformUser(lifeform, underlying);
-        LifeformUser receiver = new LifeformUser(lifeform, underlying);
-        LifeformUser operator = new LifeformUser(lifeform, underlying);
+        LifeformsUser usr = new LifeformsUser(lifeforms, underlying);
+        LifeformsUser receiver = new LifeformsUser(lifeforms, underlying);
+        LifeformsUser operator = new LifeformsUser(lifeforms, underlying);
 
         underlying.mint(address(usr), 100e18);
 
         // First mint a token
-        uint256 tokenId = lifeform.mint(address(usr));
-        assertEq(lifeform.totalSupply(), 1);
-        assertEq(lifeform.balanceOf(address(usr)), 1);
-        assertEq(lifeform.ownerOf(tokenId), address(usr));
+        uint256 tokenId = lifeforms.mint(address(usr));
+        assertEq(lifeforms.totalSupply(), 1);
+        assertEq(lifeforms.balanceOf(address(usr)), 1);
+        assertEq(lifeforms.ownerOf(tokenId), address(usr));
 
         // The operator should not be able to transfer the unapproved token
         try operator.safeTransferFrom(address(usr), address(receiver), tokenId) {
@@ -149,7 +149,7 @@ contract LifeformLogicTest is DSTestPlus {
         // Then owner should be able to deposit underlying token after approving
         usr.approveToken(10e18);
         usr.depositToken(tokenId, 10e18);
-        assertEq(lifeform.balanceOfToken(tokenId), 10e18);
+        assertEq(lifeforms.balanceOfToken(tokenId), 10e18);
         assertEq(underlying.balanceOf(address(usr)), 90e18);
 
         // Then approve an operator for the token
@@ -157,14 +157,14 @@ contract LifeformLogicTest is DSTestPlus {
 
         // The operator should be able to withdraw the underlying token
         operator.withdrawToken(tokenId, 1e18);
-        assertEq(lifeform.balanceOfToken(tokenId), 9e18);
+        assertEq(lifeforms.balanceOfToken(tokenId), 9e18);
         assertEq(underlying.balanceOf(address(operator)), 1e18);
 
         // The operator should be able to transfer the approved token
         operator.safeTransferFrom(address(usr), address(receiver), tokenId);
-        assertEq(lifeform.balanceOf(address(usr)), 0);
-        assertEq(lifeform.balanceOf(address(receiver)), 1);
-        assertEq(lifeform.ownerOf(tokenId), address(receiver));
+        assertEq(lifeforms.balanceOf(address(usr)), 0);
+        assertEq(lifeforms.balanceOf(address(receiver)), 1);
+        assertEq(lifeforms.ownerOf(tokenId), address(receiver));
 
         // The operator now should not be able to withdraw the underlying token
         try operator.withdrawToken(tokenId, 5e18) {
@@ -183,23 +183,23 @@ contract LifeformLogicTest is DSTestPlus {
 
         // The new owner should be able to withdraw the underlying token
         receiver.withdrawToken(tokenId, 4e18);
-        assertEq(lifeform.balanceOfToken(tokenId), 5e18);
+        assertEq(lifeforms.balanceOfToken(tokenId), 5e18);
         assertEq(underlying.balanceOf(address(receiver)), 4e18);
 
         // Then new owner should be able to deposit underlying token after approving
         receiver.approveToken(3e18);
         receiver.depositToken(tokenId, 3e18);
-        assertEq(lifeform.balanceOfToken(tokenId), 8e18);
+        assertEq(lifeforms.balanceOfToken(tokenId), 8e18);
         assertEq(underlying.balanceOf(address(receiver)), 1e18);
     }
 
     function testSafeTransferFromWithApproveForAll() public {
-        LifeformUser usr = new LifeformUser(lifeform, underlying);
-        LifeformUser receiver = new LifeformUser(lifeform, underlying);
-        LifeformUser operator = new LifeformUser(lifeform, underlying);
+        LifeformsUser usr = new LifeformsUser(lifeforms, underlying);
+        LifeformsUser receiver = new LifeformsUser(lifeforms, underlying);
+        LifeformsUser operator = new LifeformsUser(lifeforms, underlying);
 
         // First mint a token
-        uint256 tokenId = lifeform.mint(address(usr));
+        uint256 tokenId = lifeforms.mint(address(usr));
 
         // The operator should not be able to transfer the unapproved token
         try operator.safeTransferFrom(address(usr), address(receiver), tokenId) {
@@ -213,9 +213,9 @@ contract LifeformLogicTest is DSTestPlus {
 
         // The operator should be able to transfer any token from usr
         operator.safeTransferFrom(address(usr), address(receiver), tokenId);
-        assertEq(lifeform.balanceOf(address(usr)), 0);
-        assertEq(lifeform.balanceOf(address(receiver)), 1);
-        assertEq(lifeform.ownerOf(tokenId), address(receiver));
+        assertEq(lifeforms.balanceOf(address(usr)), 0);
+        assertEq(lifeforms.balanceOf(address(receiver)), 1);
+        assertEq(lifeforms.ownerOf(tokenId), address(receiver));
 
         // The operator now should not be able to transfer the token
         // since it was not approved by the current user

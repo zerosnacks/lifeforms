@@ -8,7 +8,7 @@ let
 in
   pkgs.mkShell {
     src = null;
-    name = "lifeform";
+    name = "lifeforms";
     buildInputs = with pkgs; [
       pkgs.dapp
       pkgs.seth
