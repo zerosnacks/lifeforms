@@ -35,8 +35,8 @@ deploy-polygon: check-api-key deploy
 deploy-rinkeby: export ETH_RPC_URL = $(call eth_network,rinkeby)
 deploy-rinkeby: check-api-key deploy
 
-# verify on Etherscan
-verify:; ETH_RPC_URL=$(call network,$(network_name)) dapp verify-contract src/Lifeform.sol:Lifeform $(contract_address)
+# verify on Polygonscan
+verify:; ETH_RPC_URL=$(call polygon_network,mainnet) dapp verify-contract src/Lifeform.sol:Lifeform $(contract_address)
 
 check-api-key:
 ifndef ALCHEMY_API_KEY
