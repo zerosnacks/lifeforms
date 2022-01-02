@@ -21,14 +21,6 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
     // EVENTS
     // ======
 
-    /// @notice Emitted after a succesful pause state switch.
-    /// @param user The address that paused the contract
-    event Paused(address indexed user, bool isPaused);
-
-    /// @notice Emitted after a succesful sale state switch.
-    /// @param user The address that paused the contract
-    event SaleActive(address indexed user, bool isSale);
-
     /// @notice Emitted after a successful deposit.
     /// @param user The address that deposited into the NFT.
     /// @param tokenId The token id the user deposited to.
@@ -40,27 +32,6 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
     /// @param tokenId The token id the user withdrew from.
     /// @param underlyingAmount The amount of underlying tokens that were withdrawn.
     event TokenWithdraw(address indexed user, uint256 tokenId, uint256 underlyingAmount);
-
-    /// @notice Emitted after token total reserve update.
-    /// @param user The address that updated the token total reserve cap.
-    /// @param newTokenCap The amount of underlying tokens that are allowed to be deposited.
-    event TokenCapUpdate(address indexed user, uint256 newTokenCap);
-
-    /// @notice Emitted after token total reserve update.
-    /// @param user The address that updated the token scalar.
-    /// @param newTokenScalar The amount of effect that the deposited underlying tokens have the visual image.
-    event TokenScalarUpdate(address indexed user, uint256 newTokenScalar);
-
-    /// @notice Emitted after a succesful claim.
-    /// @param user The address that claimed the ETH.
-    /// @param to The address that the claimed ETH was transferred to.
-    /// @param amount The amount of the ETH balance that was transferred.
-    event Claim(address indexed user, address indexed to, uint256 amount);
-
-    /// @notice Emitted after a succesful rescue.
-    /// @param user The address that rescued the ERC20 token.
-    /// @param token The ERC20 token that was rescued.
-    event Rescue(address indexed user, address token);
 
     // ==================
     // ERC20-LIKE STORAGE
@@ -234,57 +205,6 @@ contract Lifeform is ERC721, NFTSVG, Ownable {
         tokenURI[id] = generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0, tokenScalar: tokenScalar}));
 
         return id;
-    }
-
-    // ====================
-    // ADMINISTRATIVE LOGIC
-    // ====================
-
-    /// @notice Sets the token scalar.
-    /// @param _tokenScalar The amount of effect that the deposited underlying tokens have the visual image.
-    function setTokenScalar(uint256 _tokenScalar) external onlyOwner {
-        tokenScalar = _tokenScalar;
-
-        for (uint256 i = 0; i < totalSupply; i++) {
-            tokenURI[i] = generateTokenURI(
-                NFTSVG.SVGParams({tokenId: i, tokenBalance: tokenBalances[i], tokenScalar: tokenScalar})
-            );
-        }
-
-        emit TokenScalarUpdate(msg.sender, tokenScalar);
-    }
-
-    /// @notice Sets the token reserve cap.
-    /// @param _tokenCap The token amount allowed to be deposited per token id.
-    function setTokenCap(uint256 _tokenCap) external onlyOwner {
-        tokenCap = _tokenCap;
-
-        emit TokenCapUpdate(msg.sender, tokenCap);
-    }
-
-    /// @notice Flips to paused or unpaused.
-    function flipPause() external onlyOwner {
-        isPaused = !isPaused;
-
-        emit Paused(msg.sender, isPaused);
-    }
-
-    /// @notice Flips to active or inactive.
-    function flipSale() external onlyOwner {
-        isSaleActive = !isSaleActive;
-
-        emit SaleActive(msg.sender, isSaleActive);
-    }
-
-    /// @notice Claim all received funds.
-    /// @dev Caller will receive any ETH held as float.
-    /// @param to Address to send ETH to.
-    function claim(address to) external onlyOwner {
-        uint256 selfBalance = address(this).balance;
-
-        payable(to).transfer(selfBalance);
-
-        emit Claim(msg.sender, to, selfBalance);
     }
 
     // ===================

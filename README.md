@@ -32,11 +32,6 @@ The artwork is composed as an on-chain `SVG` on mint and is dynamically updated 
 
 ![Lifeform progression](./assets/1.png)
 
-## Notices
-
-- BCT token deposits are capped at 10 BCT per NFT until further notice.
-- The contract has a high degree of admin control until further notice.
-
 ## Acknowledgements
 
 These contracts were inspired by or directly modified from many sources, primarily:
