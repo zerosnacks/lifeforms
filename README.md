@@ -1,6 +1,6 @@
 # Lifeforms
 
-Carbon bearing NFT - stores [BCT (Base Carbon Tonne)](https://www.coingecko.com/en/coins/toucan-protocol-base-carbon-tonne) carbon credits inside of NFTs. The more you store inside the more you improve the visual fidelity of your carbon lifeform.
+Carbon bearing NFT - stores [BCT (Base Carbon Tonne)](https://www.coingecko.com/en/coins/toucan-protocol-base-carbon-tonne) carbon credits inside of NFTs. The more BCT you store inside the more you improve the visual fidelity of your carbon lifeform.
 
 **THIS PROJECT IS UNAUDITED AND EXPERIMENTAL. PROCEED WITH CAUTION.**
 
