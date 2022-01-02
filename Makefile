@@ -27,12 +27,12 @@ size   :; ./scripts/contract-size.sh ${contract}
 # Deployment helpers
 deploy :; @./scripts/deploy.sh
 
-# mainnet
-deploy-mainnet: export ETH_RPC_URL = $(call network,mainnet)
-deploy-mainnet: check-api-key deploy
+# polygon
+deploy-polygon: export ETH_RPC_URL = $(call polygon_network,mainnet)
+deploy-polygon: check-api-key deploy
 
 # rinkeby
-deploy-rinkeby: export ETH_RPC_URL = $(call network,rinkeby)
+deploy-rinkeby: export ETH_RPC_URL = $(call eth_network,rinkeby)
 deploy-rinkeby: check-api-key deploy
 
 # verify on Etherscan
@@ -45,7 +45,12 @@ endif
 
 # Returns the URL to deploy to a hosted node.
 # Requires the ALCHEMY_API_KEY env var to be set.
-# The first argument determines the network (mainnet / rinkeby / ropsten / kovan / goerli)
-define network
+define polygon_network
+https://polygon-$1.g.alchemy.com/v2/${ALCHEMY_API_KEY}
+endef
+
+# Returns the URL to deploy to a hosted node.
+# Requires the ALCHEMY_API_KEY env var to be set.
+define eth_network
 https://eth-$1.alchemyapi.io/v2/${ALCHEMY_API_KEY}
 endef
