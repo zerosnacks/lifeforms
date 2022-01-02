@@ -27,16 +27,13 @@ size:; ./scripts/contract-size.sh ${contract}
 # Deployment helpers
 deploy:; @./scripts/deploy.sh
 
-# polygon
-deploy-polygon: export ETH_RPC_URL = $(call polygon_network,mainnet)
-deploy-polygon: check-api-key deploy
-
 # rinkeby
-deploy-rinkeby: export ETH_RPC_URL = $(call eth_network,rinkeby)
+deploy-rinkeby: export ETH_RPC_URL = $(call network,rinkeby)
 deploy-rinkeby: check-api-key deploy
 
-# verify on Polygonscan
-verify:; ETH_RPC_URL=$(call polygon_network,mainnet) dapp verify-contract src/Lifeform.sol:Lifeform $(contract_address)
+# verify on Etherscan
+# verify-lifeform:; ETH_RPC_URL=$(call network,rinkeby) dapp verify-contract src/Lifeform.sol:Lifeform 0x828edeb6c951586Ee924A65f09242D080d7b4Ae0 100 0xEE35A17d801bEb3cED0FC2059AE503aB34c96BE1
+verify-mbct:; ETH_RPC_URL=$(call network,rinkeby) dapp verify-contract src/MockBCT.sol:MockBCT 0xEE35A17d801bEb3cED0FC2059AE503aB34c96BE1 \"MockBCT\" \"MBCT\" 18
 
 check-api-key:
 ifndef ALCHEMY_API_KEY
@@ -45,12 +42,6 @@ endif
 
 # Returns the URL to deploy to a hosted node.
 # Requires the ALCHEMY_API_KEY env var to be set.
-define polygon_network
-https://polygon-$1.g.alchemy.com/v2/${ALCHEMY_API_KEY}
-endef
-
-# Returns the URL to deploy to a hosted node.
-# Requires the ALCHEMY_API_KEY env var to be set.
-define eth_network
+define network
 https://eth-$1.alchemyapi.io/v2/${ALCHEMY_API_KEY}
 endef

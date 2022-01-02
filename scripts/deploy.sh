@@ -6,14 +6,8 @@ set -eo pipefail
 . $(dirname $0)/common.sh
 
 # Deploy.
-# MockBCTAddr=$(deploy MockBCT)
+# MockBCTAddr=$(deploy MockBCT \"MockBCT\" \"MBCT\" 18)
 # log "MockBCT deployed at:" $MockBCTAddr
 
-# maxSupply, // maxSupply
-# salePrice, // salePrice
-# tokenCap, // tokenCap
-# tokenScalar, // tokenScalar
-# underlying // underlying
-
-LifeformAddr=$(deploy Lifeform 100 10000000000000000 10000000000000000000 250 0x0c504eAf83941DB8DF4913EFDD35913EFBE67984)
+LifeformAddr=$(deploy Lifeform 100 0xEE35A17d801bEb3cED0FC2059AE503aB34c96BE1)
 log "Lifeform deployed at:" $LifeformAddr

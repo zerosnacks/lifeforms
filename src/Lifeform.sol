@@ -37,7 +37,7 @@ contract Lifeform is ERC721, NFTSVG {
     // ==================
 
     /// @notice Tracks the total amount of underlying tokens deposited.
-    uint256 public tokenTotalReserve;
+    uint256 public tokenReserve;
 
     /// @notice Mapping of underlying token balances.
     mapping(uint256 => uint256) public tokenBalances;
@@ -97,7 +97,7 @@ contract Lifeform is ERC721, NFTSVG {
         // will never be larger than the total supply.
         unchecked {
             tokenBalances[tokenId] += underlyingAmount;
-            tokenTotalReserve += underlyingAmount;
+            tokenReserve += underlyingAmount;
         }
 
         tokenURI[tokenId] = generateTokenURI(
@@ -120,7 +120,7 @@ contract Lifeform is ERC721, NFTSVG {
         // will never be larger than the total supply.
         unchecked {
             tokenBalances[tokenId] -= underlyingAmount;
-            tokenTotalReserve -= underlyingAmount;
+            tokenReserve -= underlyingAmount;
         }
 
         // Transfer the provided amount of underlying tokens to msg.sender from this contract.
