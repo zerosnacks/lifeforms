@@ -302,12 +302,7 @@ contract LifeformGasTest is DSTestPlus {
         tokenId = lifeform.mint{value: salePrice}(address(usr));
     }
 
-    function testDepositToken() public {
+    function testUpdateToken() public {
         usr.depositToken(tokenId, 5e18);
-    }
-
-    function testWithdrawToken() public {
-        usr.depositToken(tokenId, 5e18);
-        usr.withdrawToken(tokenId, 4e18);
     }
 }
