@@ -30,8 +30,6 @@ contract LifeformLogicTest is DSTestPlus {
 
         lifeform = new Lifeform(
             maxSupply, // maxSupply
-            tokenCap, // tokenCap
-            tokenScalar, // tokenScalar
             underlying // underlying
         );
     }
@@ -273,8 +271,6 @@ contract LifeformGasTest is DSTestPlus {
 
         lifeform = new Lifeform(
             maxSupply, // maxSupply
-            tokenCap, // tokenCap
-            tokenScalar, // tokenScalar
             underlying // underlying
         );
 
