@@ -10,7 +10,6 @@ import {Strings} from "../libraries/Strings.sol";
 
 // TODO: Only a portion of the string needs to be updated, perhaps we can just update that part
 
-/// @title NFTSVG
 /// @notice Provides a function for generating an SVG
 /// @author Modified from Uniswap V3 (https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/NFTSVG.sol)
 abstract contract NFTSVG {

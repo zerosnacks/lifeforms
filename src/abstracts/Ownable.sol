@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity >=0.8.0;
 
+/// @author Modified from OpenZeppelin (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol)
 abstract contract Ownable {
     address private _owner;
 
