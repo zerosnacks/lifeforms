@@ -2,7 +2,7 @@ let
   pkgs = import (builtins.fetchGit rec {
     name = "dapptools-${rev}";
     url = https://github.com/dapphub/dapptools;
-    rev = "fb9476ded759da44c449eb391cc67bfb0df61112";
+    rev = "adcc076b1441b3a928a8f0b42b2a63f05d9bcf0d";
   }) {};
 
 in
@@ -11,5 +11,8 @@ in
     name = "lifeform";
     buildInputs = with pkgs; [
       pkgs.dapp
+      pkgs.seth
+      pkgs.go-ethereum-unlimited
+      pkgs.hevm
     ];
   }

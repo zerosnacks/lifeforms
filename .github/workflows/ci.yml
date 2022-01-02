@@ -3,7 +3,16 @@ name: Tests
 on:
   push:
     branches:
-      - "master"
+      - master
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: true
+  FORCE_COLOR: 2
 
 jobs:
   tests:
@@ -11,6 +20,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - uses: actions/setup-node@v2
       - uses: cachix/install-nix-action@v13
       - uses: cachix/cachix-action@v10
@@ -18,15 +29,10 @@ jobs:
           name: dapp
 
       - name: Install dependencies
-        run: |
-          nix-env -f https://github.com/dapphub/dapptools/archive/master.tar.gz -iA solc-static-versions.solc_0_8_10
-          yarn
-          dapp update
+        run: nix-shell --run 'make'
 
       - name: Check gas snapshots
-        run: make gas
+        run: nix-shell --run 'make gas'
 
       - name: Run tests
-        run: make test
-        env:
-          DEEP_FUZZ: false
+        run: nix-shell --run 'make test'
