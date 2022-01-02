@@ -16,8 +16,8 @@ contract LifeformLogicTest is DSTestPlus {
     Lifeform private lifeform;
     MockERC20 private underlying;
 
-    string private name = "Lifeform";
-    string private symbol = "LIFE";
+    string private name = "Carbon Lifeform";
+    string private symbol = "CLIFE";
     uint256 private maxSupply = 3;
 
     // Users
