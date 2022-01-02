@@ -1,6 +1,6 @@
 # Lifeforms
 
-Carbon bearing NFT - stores [BCT (Base Carbon Tonne)](https://www.coingecko.com/en/coins/toucan-protocol-base-carbon-tonne) carbon credits inside of NFTs. The more you store inside the more you improve the visual quality of your carbon lifeform.
+Carbon bearing NFT - stores [BCT (Base Carbon Tonne)](https://www.coingecko.com/en/coins/toucan-protocol-base-carbon-tonne) carbon credits inside of NFTs. The more you store inside the more you improve the visual fidelity of your carbon lifeform.
 
 **THIS PROJECT IS UNAUDITED AND EXPERIMENTAL. PROCEED WITH CAUTION.**
 
@@ -12,7 +12,7 @@ Voluntary carbon markets enable individuals and organisations to offset their CO
 
 Because BCT is a fungible and freely tradable ERC20-token projects can create artificial on-chain demand through innovative gamified locking mechanisms. One such project is [KlimaDAO](https://www.klimadao.finance/), a fork of the popular Olympus Protocol designed to capture carbon inside its treasury.
 
-`Lifeforms` is an attempt at a different kind of locking mechanism. By directly tying the visual quality of the NFT to the amount of BCT tokens deposited into the NFT, users are incentivised to bind BCT tokens to their NFTs.
+`Lifeforms` is an attempt at a different kind of locking mechanism. By directly tying the visual fidelity of the NFT to the amount of BCT tokens deposited into the NFT, users are incentivised to bind semi-permanently BCT tokens to their NFTs.
 
 A `Lifeform` with 0 BCT deposited
 
@@ -26,7 +26,7 @@ This on-chain demand is directly reflected - be it on a micro-scale - in the rea
 
 ## How?
 
-Through `depositToken` users deposit BCT tokens into the `Lifeform` contract address. Internally a balance is tied to the `tokenId`, not the address the user deposited the tokens with. When the NFT is transferred the `tokenBalance` remains tied to the `tokenId`. If the user desires they can withdraw their deposited BCT tokens at any time using the `withdrawToken` method except after the NFT itself has been transferred already.
+After approving with `approveToken` users deposit BCT tokens into the `Lifeform` contract address using `depositToken`. Internally a balance is tied to the `tokenId` instead of the address the user deposited the tokens with. When the NFT is transferred the `tokenBalance` remains tied to the `tokenId` meaning the BCT tokens remain tied to the NFT, not the depositor. If the user desires they can withdraw their deposited BCT tokens at any time using the `withdrawToken` method except after the NFT itself has been transferred already. This will in turn update the token to reflect its current balance with the according level of visual fidelity.
 
 The artwork is composed as an on-chain `SVG` on mint and is dynamically updated to reflect the current BCT balance of the NFT whenever the user deposits into or withdraws BCT tokens from the NFT.
 
