@@ -12,7 +12,7 @@ import {NFTSVG} from "./abstracts/NFTSVG.sol";
 import {Ownable} from "./abstracts/Ownable.sol";
 
 /// @title Lifeform
-/// @notice Carbon bearing NFT
+/// @notice Carbon bearing NFT allowing users to store BCT (Base Carbon Tonne) carbon credits inside of NFTs
 contract Lifeform is ERC721, NFTSVG, Ownable {
     using SafeTransferLib for ERC20;
     using FixedPointMathLib for uint256;
