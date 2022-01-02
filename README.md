@@ -18,7 +18,7 @@ A `Lifeform` with 0 BCT deposited
 
 ![Lifeform 0 BCT](./assets/99-0.svg)
 
-A `Lifeform` with 6 BCT deposited
+A `Lifeform` with 1500 BCT deposited
 
 ![Lifeform 6 BCT](./assets/99-1500.svg)
 
