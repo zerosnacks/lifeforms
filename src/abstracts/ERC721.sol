@@ -2,7 +2,8 @@
 pragma solidity >=0.8.0;
 
 /// @notice Modern, minimalist, and gas efficient ERC-721 implementation.
-/// @notice tokenURI is a custom mapping implementation different from solmate/tokens/ERC721.sol
+/// @notice tokenURI, custom mapping implementation, different from solmate/tokens/ERC721.sol
+/// @notice totalSupply, addition to solmate/tokens/ERC721.sol
 /// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/tokens/ERC721.sol)
 /// @dev Note that balanceOf does not revert if passed the zero address, in defiance of the ERC.
 abstract contract ERC721 {
@@ -91,9 +92,9 @@ abstract contract ERC721 {
             balanceOf[to]++;
         }
 
-        delete getApproved[id];
-
         ownerOf[id] = to;
+
+        delete getApproved[id];
 
         emit Transfer(from, to, id);
     }
@@ -174,6 +175,8 @@ abstract contract ERC721 {
         }
 
         delete ownerOf[id];
+
+        delete getApproved[id];
 
         emit Transfer(owner, address(0), id);
     }
