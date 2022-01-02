@@ -70,26 +70,15 @@ abstract contract NFTSVG {
                     string(
                         abi.encodePacked(
                             '<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
-                            _generateSVGDefs(params),
+                            '<defs><clipPath id="a"><rect width="600" height="600" rx="38" ry="38"/></clipPath><filter id="b"><feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.005" numOctaves="5" seed="',
+                            params.tokenId.toString(),
+                            '" /><feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="',
+                            params.tokenBalance.toString(),
+                            '" /></filter></defs>'
                             '<g clip-path="url(#a)"><path fill="rgba(239,239,239,1.0)" d="M0 0h600v600H0z" /><path fill="none" style="filter:url(#b)" d="M0 0h600v600H0z" /><rect width="600" height="600" rx="38" ry="38" fill="none" stroke="rgba(0,0,0,.25)" /></g></svg>'
                         )
                     )
                 )
             );
-    }
-
-    function _generateSVGDefs(SVGParams memory params) private pure returns (string memory svg) {
-        /// @notice tokenBalance has been scaled by 10**18, so say 250 * 10 = 2500
-        uint256 scale = 250 * params.tokenBalance;
-
-        svg = string(
-            abi.encodePacked(
-                '<defs><clipPath id="a"><rect width="600" height="600" rx="38" ry="38"/></clipPath><filter id="b"><feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.005" numOctaves="5" seed="',
-                params.tokenId.toString(),
-                '" /><feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="',
-                scale.toString(),
-                '" /></filter></defs>'
-            )
-        );
     }
 }

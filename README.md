@@ -1,10 +1,8 @@
 # Lifeforms
 
-**PROOF OF CONCEPT**
-
 Carbon bearing NFT - stores [BCT (Base Carbon Tonne)](https://toucan.earth/) carbon credits inside of NFTs. The more BCT you store inside the more you improve the visual fidelity of your carbon lifeform.
 
-**THIS PROJECT IS UNAUDITED AND EXPERIMENTAL. PROCEED WITH CAUTION.**
+**THIS PROJECT IS A PROOF OF CONCEPT, UNAUDITED AND EXPERIMENTAL. PROCEED WITH CAUTION.**
 
 ## Overview
 
