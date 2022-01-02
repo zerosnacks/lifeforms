@@ -19,8 +19,6 @@ contract LifeformLogicTest is DSTestPlus {
     string private name = "Lifeform";
     string private symbol = "LIFE";
     uint256 private maxSupply = 3;
-    uint256 private tokenCap = 10e18;
-    uint256 private tokenScalar = 250;
 
     // Users
     address internal immutable self = address(this);
@@ -87,40 +85,21 @@ contract LifeformLogicTest is DSTestPlus {
 
         assertEq(lifeform.tokenBalances(tokenId), 0);
 
-        emit log_named_string("TokenURI 0", lifeform.tokenURI(tokenId));
+        emit log_named_string("TokenURI 0 BCT", lifeform.tokenURI(tokenId));
 
-        usr.depositToken(tokenId, 1e18);
-        assertEq(lifeform.tokenBalances(tokenId), 1e18);
+        usr.depositToken(tokenId, 5e18);
+        assertEq(lifeform.tokenBalances(tokenId), 5e18);
+        assertEq(underlying.balanceOf(address(usr)), 5e18);
 
-        emit log_named_string("TokenURI 1", lifeform.tokenURI(tokenId));
+        emit log_named_string("TokenURI 5 BCT", lifeform.tokenURI(tokenId));
 
-        usr.withdrawToken(tokenId, 1e18);
+        usr.withdrawToken(tokenId, 5e18);
         assertEq(lifeform.tokenBalances(tokenId), 0);
+        assertEq(underlying.balanceOf(address(usr)), 10e18);
 
-        emit log_named_string("TokenURI 0", lifeform.tokenURI(tokenId));
+        emit log_named_string("TokenURI 0 BCT", lifeform.tokenURI(tokenId));
 
         assertEq(underlying.balanceOf(address(usr)), preDepositBal);
-    }
-
-    function testTokenCap() public {
-        LifeformUser usr = new LifeformUser(lifeform, underlying);
-
-        underlying.mint(address(usr), 100e18);
-
-        // First mint a token
-        uint256 tokenId = lifeform.mint(address(usr));
-        assertEq(lifeform.totalSupply(), 1);
-        assertEq(lifeform.balanceOf(address(usr)), 1);
-        assertEq(lifeform.ownerOf(tokenId), address(usr));
-
-        usr.approveToken(100e18);
-
-        // Token deposit should be limited to token cap
-        try usr.depositToken(tokenId, 100e18) {
-            fail();
-        } catch Error(string memory error) {
-            assertEq(error, "TOKEN_RESERVE_IS_CAPPED");
-        }
     }
 
     function testDepositWithdraw() public {
@@ -250,43 +229,5 @@ contract LifeformLogicTest is DSTestPlus {
         } catch Error(string memory error) {
             assertEq(error, "NOT_AUTHORIZED");
         }
-    }
-}
-
-contract LifeformGasTest is DSTestPlus {
-    Lifeform private lifeform;
-    MockERC20 private underlying;
-    uint256 private tokenId;
-    LifeformUser private usr;
-
-    string private name = "Lifeform";
-    string private symbol = "LIFE";
-    uint256 private maxSupply = 100;
-    uint256 private salePrice = 10e18;
-    uint256 private tokenCap = 10e18;
-    uint256 private tokenScalar = 250;
-
-    function setUp() public {
-        underlying = new MockERC20("Mock Token", "TKN", 18);
-
-        lifeform = new Lifeform(
-            maxSupply, // maxSupply
-            underlying // underlying
-        );
-
-        usr = new LifeformUser(lifeform, underlying);
-
-        underlying.mint(address(usr), 20e18);
-        usr.approveToken(20e18);
-
-        tokenId = lifeform.mint(address(usr));
-    }
-
-    function testMint() public {
-        tokenId = lifeform.mint(address(usr));
-    }
-
-    function testUpdateToken() public {
-        usr.depositToken(tokenId, 5e18);
     }
 }
