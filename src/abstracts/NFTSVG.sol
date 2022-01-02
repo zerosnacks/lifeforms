@@ -88,19 +88,11 @@ abstract contract NFTSVG {
 
         svg = string(
             abi.encodePacked(
-                "<defs>",
-                '<clipPath xmlns="http://www.w3.org/2000/svg" id="a">',
-                '<rect width="600" height="600" rx="38" ry="38"/>',
-                "</clipPath>",
-                '<filter id="b">',
-                '<feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.005" numOctaves="5" seed="',
+                '<defs><clipPath id="a"><rect width="600" height="600" rx="38" ry="38"/></clipPath><filter id="b"><feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.005" numOctaves="5" seed="',
                 params.tokenId.toString(),
-                '" />',
-                '<feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="',
+                '" /><feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="',
                 scale.toString(),
-                '" />',
-                "</filter>",
-                "</defs>"
+                '" /></filter></defs>'
             )
         );
     }
