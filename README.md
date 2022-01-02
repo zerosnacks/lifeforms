@@ -10,7 +10,7 @@ Volunatary carbon markets enable individuals and organisations to offset their C
 
 ## Why?
 
-Because BCT is a fungible and freely tradeable ERC20-token projects can create artificial on-chain demand through innovative gamified locking mechanisms. This NFT project called `Lifeforms` is an attempt at such a locking mechanism. By directly tying the visual representation of the NFT to the amount of BCT tokens deposited into the NFT users are incentivised to bind BCT tokens to their NFTs.
+Because BCT is a fungible and freely tradeable ERC20-token, projects can create artificial on-chain demand through innovative gamified locking mechanisms. This NFT project called `Lifeforms` is an attempt at such a locking mechanism. By directly tying the visual quality of the NFT to the amount of BCT tokens deposited into the NFT users are incentivised to bind BCT tokens to their NFTs.
 
 A `Lifeform` with 0 BCT deposited
 
@@ -20,7 +20,7 @@ A `Lifeform` with 6 BCT deposited
 
 ![Lifeform 6 BCT](./assets/99-1500.svg)
 
-This on-chain demand is directly reflected, be it on a micro-scale, in the real world. If the price of BCT goes up the traditional carbon credit market is incentivised to permanently retire their carbon credits and bring them on chain.
+This on-chain demand is directly reflected, be it on a micro-scale, in the real world. If the price of BCT goes up the traditional carbon credit market is incentivised to permanently retire their carbon credits and bring them on chain. This in turn creates more demand for projects to be developed that bring forth these carbon credits.
 
 ## How?
 
