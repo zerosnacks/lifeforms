@@ -93,9 +93,6 @@ contract Lifeforms is ERC721, NFTSVG {
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
 
-        // Transfer the provided amount of underlying tokens from msg.sender to this contract.
-        UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
-
         // Cannot overflow because a user's balance
         // will never be larger than the total supply.
         unchecked {
@@ -106,6 +103,9 @@ contract Lifeforms is ERC721, NFTSVG {
         tokenURI[tokenId] = generateTokenURI(
             NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
+        
+        // Transfer the provided amount of underlying tokens from msg.sender to this contract.
+        UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
 
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
     }
