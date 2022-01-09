@@ -103,7 +103,7 @@ contract Lifeforms is ERC721, NFTSVG {
         tokenURI[tokenId] = generateTokenURI(
             NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
-        
+
         // Transfer the provided amount of underlying tokens from msg.sender to this contract.
         UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
 
@@ -126,12 +126,12 @@ contract Lifeforms is ERC721, NFTSVG {
             tokenReserve -= underlyingAmount;
         }
 
-        // Transfer the provided amount of underlying tokens to msg.sender from this contract.
-        UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
-
         tokenURI[tokenId] = generateTokenURI(
             NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
+
+        // Transfer the provided amount of underlying tokens to msg.sender from this contract.
+        UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
     }
