@@ -12,7 +12,7 @@ import {NFTSVG} from "./abstracts/NFTSVG.sol";
 import {Ownable} from "./abstracts/Ownable.sol";
 
 /// @title Lifeforms
-/// @notice Carbon bearing NFT allowing users to store BCT (Base Carbon Tonne) carbon credits inside of NFTs
+/// @notice Carbon bearing NFT allowing users to store BCT (Base Carbon Tonne) carbon credits inside of NFTs.
 contract Lifeforms is Ownable, ERC721, NFTSVG {
     using SafeTransferLib for ERC20;
     using FixedPointMathLib for uint256;
@@ -66,7 +66,7 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
     // CONSTRUCTOR
     // ===========
 
-    /// @notice Creates a new Lifeforms instance
+    /// @notice Creates a new Lifeforms instance.
     /// @param _maxSupply Maximum number of token instances that can be minted on this contract.
     /// @param _underlying The underlying token the NFT accepts.
     constructor(uint256 _maxSupply, ERC20 _underlying) ERC721("Lifeforms", "LIFE") {
@@ -99,8 +99,7 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
 
-        // Cannot overflow because a user's balance
-        // will never be larger than the total supply.
+        // Cannot overflow because a user's balance will never be larger than the total supply.
         unchecked {
             tokenBalances[tokenId] += underlyingAmount;
             tokenReserve += underlyingAmount;
@@ -125,8 +124,7 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
         require(underlyingAmount <= tokenBalances[tokenId], "AMOUNT_EXCEEDS_TOKEN_ID_BALANCE");
 
-        // Cannot underflow because a user's balance
-        // will never be larger than the total supply.
+        // Cannot underflow because a user's balance will never be larger than the total supply.
         unchecked {
             tokenBalances[tokenId] -= underlyingAmount;
             tokenReserve -= underlyingAmount;
@@ -156,7 +154,7 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
     // MINT LOGIC
     // ==========
 
-    /// @notice Mint token to address
+    /// @notice Mint token to address.
     /// @param to The address to mint to.
     function mint(address to) external payable returns (uint256) {
         require(totalSupply + 1 <= maxSupply, "ALL_TOKENS_MINTED");
