@@ -12,9 +12,9 @@ import {Lifeforms} from "../Lifeforms.sol";
 // Test utilities
 import {LifeformsUser} from "./users/LifeformsUser.sol";
 
-contract LifeformLogicTest is DSTestPlus {
-    Lifeforms private lifeforms;
-    MockERC20 private underlying;
+contract LifeformsTest is DSTestPlus {
+    Lifeforms lifeforms;
+    MockERC20 underlying;
 
     string private name = "Lifeforms";
     string private symbol = "LIFE";
