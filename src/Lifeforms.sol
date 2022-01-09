@@ -111,10 +111,10 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
             NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
 
+        emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
+
         // Transfer the provided amount of underlying tokens from msg.sender to this contract.
         UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
-
-        emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
     }
 
     /// @notice Withdraw a specific amount of underlying tokens from an owned token id.
@@ -137,10 +137,10 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
             NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
 
+        emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
+
         // Transfer the provided amount of underlying tokens to msg.sender from this contract.
         UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
-
-        emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
     }
 
     /// @notice Check if spender owns the token or is approved to interact with the token.
@@ -180,11 +180,11 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
     /// @param to Address to send ETH to.
     function claim(address to) external onlyOwner {
         uint256 selfBalance = address(this).balance;
-        (bool success, ) = to.call{value: selfBalance}("");
-
-        require(success, "FAILED_TRANSFER");
 
         emit Claim(msg.sender, to, selfBalance);
+
+        (bool success, ) = to.call{value: selfBalance}("");
+        require(success, "FAILED_TRANSFER");
     }
 
     // ===================
