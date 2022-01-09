@@ -26,6 +26,7 @@ abstract contract NFTSVG {
                     "data:application/json;base64,",
                     Base64.encode(
                         bytes(
+                            /* solhint-disable quotes */
                             abi.encodePacked(
                                 '{"name":"',
                                 _generateName(params),
@@ -38,6 +39,7 @@ abstract contract NFTSVG {
                                 _generateAttributes(params),
                                 "}"
                             )
+                            /* solhint-enable */
                         )
                     )
                 )
@@ -68,6 +70,7 @@ abstract contract NFTSVG {
             Base64.encode(
                 bytes(
                     string(
+                        /* solhint-disable quotes */
                         abi.encodePacked(
                             '<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
                             '<defs><clipPath id="a"><rect width="600" height="600" rx="38" ry="38"/></clipPath><filter id="b"><feTurbulence in="SourceGraphic" type="fractalNoise" baseFrequency="0.005" numOctaves="5" seed="',
@@ -77,6 +80,7 @@ abstract contract NFTSVG {
                             '" /></filter></defs>'
                             '<g clip-path="url(#a)"><path fill="rgba(239,239,239,1.0)" d="M0 0h600v600H0z" /><path fill="none" style="filter:url(#b)" d="M0 0h600v600H0z" /><rect width="600" height="600" rx="38" ry="38" fill="none" stroke="rgba(0,0,0,.25)" /></g></svg>'
                         )
+                        /* solhint-enable */
                     )
                 )
             );

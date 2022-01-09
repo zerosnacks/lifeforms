@@ -239,7 +239,7 @@ contract LifeformLogicTest is DSTestPlus {
         uint256 initialOwnerBalance = address(this).balance;
         assertEq(address(lifeforms).balance, 0);
 
-        uint256 tokenId = lifeforms.mint{value: 1 ether}(address(usr));
+        lifeforms.mint{value: 1 ether}(address(usr));
         assertEq(address(lifeforms).balance, 1 ether);
         assertEq(address(this).balance, initialOwnerBalance - 1 ether);
 
@@ -255,6 +255,7 @@ contract LifeformLogicTest is DSTestPlus {
         assertEq(address(this).balance, initialOwnerBalance);
     }
 
-     // Required for `testClaim()`
+    // Required for `testClaim()`
+    // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
 }
