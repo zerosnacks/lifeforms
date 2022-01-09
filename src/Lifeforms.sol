@@ -54,7 +54,7 @@ contract Lifeforms is ERC721, NFTSVG {
     uint256 public immutable BASE_UNIT;
 
     /// @notice Maximum number of token instances that can be minted on this contract.
-    uint256 public maxSupply;
+    uint256 public immutable maxSupply;
 
     // ===========
     // CONSTRUCTOR
