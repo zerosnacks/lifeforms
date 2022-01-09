@@ -21,23 +21,22 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
     // EVENTS
     // ======
 
-    /// @notice Emitted after a successful deposit.
+    /// @notice Emitted after a deposit.
     /// @param user The address that deposited into the NFT.
     /// @param tokenId The token id the user deposited to.
     /// @param underlyingAmount The amount of underlying tokens that were deposited.
     event TokenDeposit(address indexed user, uint256 tokenId, uint256 underlyingAmount);
 
-    /// @notice Emitted after a successful withdrawal.
+    /// @notice Emitted after a withdrawal.
     /// @param user The address that withdrew from the NFT.
     /// @param tokenId The token id the user withdrew from.
     /// @param underlyingAmount The amount of underlying tokens that were withdrawn.
     event TokenWithdraw(address indexed user, uint256 tokenId, uint256 underlyingAmount);
 
-    /// @notice Emitted after a succesful claim.
+    /// @notice Emitted after a claim.
     /// @param user The address that claimed the ETH.
-    /// @param to The address that the claimed ETH was transferred to.
     /// @param amount The amount of the ETH balance that was transferred.
-    event Claim(address indexed user, address indexed to, uint256 amount);
+    event Claim(address indexed user, uint256 amount);
 
     // ==================
     // ERC20-LIKE STORAGE
@@ -176,15 +175,13 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
     // ====================
 
     /// @notice Claim all received funds.
-    /// @dev Caller will receive any ETH held as float.
-    /// @param to Address to send ETH to.
-    function claim(address to) external onlyOwner {
+    /// @dev Caller will receive any ETH held inside the contract.
+    function claim() external onlyOwner {
         uint256 selfBalance = address(this).balance;
 
-        emit Claim(msg.sender, to, selfBalance);
+        emit Claim(msg.sender, selfBalance);
 
-        (bool success, ) = to.call{value: selfBalance}("");
-        require(success, "FAILED_TRANSFER");
+        SafeTransferLib.safeTransferETH(msg.sender, selfBalance);
     }
 
     // ===================
