@@ -9,10 +9,11 @@ import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 // Abstracts
 import {ERC721} from "./abstracts/ERC721.sol";
 import {NFTSVG} from "./abstracts/NFTSVG.sol";
+import {Ownable} from "./abstracts/Ownable.sol";
 
 /// @title Lifeforms
 /// @notice Carbon bearing NFT allowing users to store BCT (Base Carbon Tonne) carbon credits inside of NFTs
-contract Lifeforms is ERC721, NFTSVG {
+contract Lifeforms is Ownable, ERC721, NFTSVG {
     using SafeTransferLib for ERC20;
     using FixedPointMathLib for uint256;
 
@@ -31,6 +32,12 @@ contract Lifeforms is ERC721, NFTSVG {
     /// @param tokenId The token id the user withdrew from.
     /// @param underlyingAmount The amount of underlying tokens that were withdrawn.
     event TokenWithdraw(address indexed user, uint256 tokenId, uint256 underlyingAmount);
+
+    /// @notice Emitted after a succesful claim.
+    /// @param user The address that claimed the ETH.
+    /// @param to The address that the claimed ETH was transferred to.
+    /// @param amount The amount of the ETH balance that was transferred.
+    event Claim(address indexed user, address indexed to, uint256 amount);
 
     // ==================
     // ERC20-LIKE STORAGE
@@ -55,9 +62,6 @@ contract Lifeforms is ERC721, NFTSVG {
 
     /// @notice Maximum number of token instances that can be minted on this contract.
     uint256 public immutable maxSupply;
-
-    /// @notice Deployer of the contract that can withdraw ETH
-    address public deployer;
 
     // ===========
     // CONSTRUCTOR
@@ -112,6 +116,9 @@ contract Lifeforms is ERC721, NFTSVG {
         UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
 
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
+
+        // Transfer the provided amount of underlying tokens from msg.sender to this contract.
+        UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
     }
 
     /// @notice Withdraw a specific amount of underlying tokens from an owned token id.
@@ -138,6 +145,9 @@ contract Lifeforms is ERC721, NFTSVG {
         UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
+
+        // Transfer the provided amount of underlying tokens to msg.sender from this contract.
+        UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
     }
 
     /// @notice Check if spender owns the token or is approved to interact with the token.
@@ -168,23 +178,26 @@ contract Lifeforms is ERC721, NFTSVG {
         return id;
     }
 
+    // ====================
+    // ADMINISTRATIVE LOGIC
+    // ====================
+
+    /// @notice Claim all received funds.
+    /// @dev Caller will receive any ETH held as float.
+    /// @param to Address to send ETH to.
+    function claim(address to) external onlyOwner {
+        uint256 selfBalance = address(this).balance;
+        (bool success, ) = to.call{value: selfBalance}("");
+
+        require(success, "FAILED_TRANSFER");
+
+        emit Claim(msg.sender, to, selfBalance);
+    }
+
     // ===================
     // RECEIVE ETHER LOGIC
     // ===================
 
     /// @dev Required for the contract to receive unwrapped ETH.
     receive() external payable {}
-
-    // ===================
-    // WITHDRAW ETHER LOGIC
-    // ===================
-
-    /// @dev Required to transfer ETH from the contract balance
-    function withdrawEther(address to) external {
-        require (msg.sender == deployer, "NOT_DEPLOYER");
-
-        (bool sent, ) = to.call{value: address(this).balance}("");
-
-        require(sent, "FAILED_TRANSFER");
-    }
 }
