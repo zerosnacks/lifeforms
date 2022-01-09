@@ -56,6 +56,9 @@ contract Lifeforms is ERC721, NFTSVG {
     /// @notice Maximum number of token instances that can be minted on this contract.
     uint256 public immutable maxSupply;
 
+    /// @notice Deployer of the contract that can withdraw ETH
+    address public deployer;
+
     // ===========
     // CONSTRUCTOR
     // ===========
@@ -63,10 +66,11 @@ contract Lifeforms is ERC721, NFTSVG {
     /// @notice Creates a new Lifeforms instance
     /// @param _maxSupply Maximum number of token instances that can be minted on this contract.
     /// @param _underlying The underlying token the NFT accepts.
-    constructor(uint256 _maxSupply, ERC20 _underlying) ERC721("Lifeforms", "LIFE") {
+    constructor(uint256 _maxSupply, ERC20 _underlying, address _deployer) ERC721("Lifeforms", "LIFE") {
         maxSupply = _maxSupply;
         UNDERLYING = _underlying;
         BASE_UNIT = 10**_underlying.decimals();
+        deployer = _deployer;
     }
 
     // ================
@@ -170,4 +174,17 @@ contract Lifeforms is ERC721, NFTSVG {
 
     /// @dev Required for the contract to receive unwrapped ETH.
     receive() external payable {}
+
+    // ===================
+    // WITHDRAW ETHER LOGIC
+    // ===================
+
+    /// @dev Required to transfer ETH from the contract balance
+    function withdrawEther(address to) external {
+        require (msg.sender == deployer, "NOT_DEPLOYER");
+
+        (bool sent, ) = to.call{value: address(this).balance}("");
+
+        require(sent, "FAILED_TRANSFER");
+    }
 }
