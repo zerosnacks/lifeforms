@@ -70,11 +70,10 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
     /// @notice Creates a new Lifeforms instance
     /// @param _maxSupply Maximum number of token instances that can be minted on this contract.
     /// @param _underlying The underlying token the NFT accepts.
-    constructor(uint256 _maxSupply, ERC20 _underlying, address _deployer) ERC721("Lifeforms", "LIFE") {
+    constructor(uint256 _maxSupply, ERC20 _underlying) ERC721("Lifeforms", "LIFE") {
         maxSupply = _maxSupply;
         UNDERLYING = _underlying;
         BASE_UNIT = 10**_underlying.decimals();
-        deployer = _deployer;
     }
 
     // ================
@@ -116,9 +115,6 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
         UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
 
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
-
-        // Transfer the provided amount of underlying tokens from msg.sender to this contract.
-        UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
     }
 
     /// @notice Withdraw a specific amount of underlying tokens from an owned token id.
@@ -145,9 +141,6 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
         UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
-
-        // Transfer the provided amount of underlying tokens to msg.sender from this contract.
-        UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
     }
 
     /// @notice Check if spender owns the token or is approved to interact with the token.
