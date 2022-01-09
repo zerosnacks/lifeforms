@@ -54,7 +54,10 @@ contract Lifeforms is ERC721, NFTSVG {
     uint256 public immutable BASE_UNIT;
 
     /// @notice Maximum number of token instances that can be minted on this contract.
-    uint256 public maxSupply;
+    uint256 public immutable maxSupply;
+
+    /// @notice Deployer of the contract that can withdraw ETH
+    address public deployer;
 
     // ===========
     // CONSTRUCTOR
@@ -63,10 +66,11 @@ contract Lifeforms is ERC721, NFTSVG {
     /// @notice Creates a new Lifeforms instance
     /// @param _maxSupply Maximum number of token instances that can be minted on this contract.
     /// @param _underlying The underlying token the NFT accepts.
-    constructor(uint256 _maxSupply, ERC20 _underlying) ERC721("Lifeforms", "LIFE") {
+    constructor(uint256 _maxSupply, ERC20 _underlying, address _deployer) ERC721("Lifeforms", "LIFE") {
         maxSupply = _maxSupply;
         UNDERLYING = _underlying;
         BASE_UNIT = 10**_underlying.decimals();
+        deployer = _deployer;
     }
 
     // ================
@@ -93,9 +97,6 @@ contract Lifeforms is ERC721, NFTSVG {
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
 
-        // Transfer the provided amount of underlying tokens from msg.sender to this contract.
-        UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
-
         // Cannot overflow because a user's balance
         // will never be larger than the total supply.
         unchecked {
@@ -106,6 +107,9 @@ contract Lifeforms is ERC721, NFTSVG {
         tokenURI[tokenId] = generateTokenURI(
             NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
+
+        // Transfer the provided amount of underlying tokens from msg.sender to this contract.
+        UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
 
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
     }
@@ -126,12 +130,12 @@ contract Lifeforms is ERC721, NFTSVG {
             tokenReserve -= underlyingAmount;
         }
 
-        // Transfer the provided amount of underlying tokens to msg.sender from this contract.
-        UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
-
         tokenURI[tokenId] = generateTokenURI(
             NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
+
+        // Transfer the provided amount of underlying tokens to msg.sender from this contract.
+        UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
     }
@@ -170,4 +174,17 @@ contract Lifeforms is ERC721, NFTSVG {
 
     /// @dev Required for the contract to receive unwrapped ETH.
     receive() external payable {}
+
+    // ===================
+    // WITHDRAW ETHER LOGIC
+    // ===================
+
+    /// @dev Required to transfer ETH from the contract balance
+    function withdrawEther(address to) external {
+        require (msg.sender == deployer, "NOT_DEPLOYER");
+
+        (bool sent, ) = to.call{value: address(this).balance}("");
+
+        require(sent, "FAILED_TRANSFER");
+    }
 }
