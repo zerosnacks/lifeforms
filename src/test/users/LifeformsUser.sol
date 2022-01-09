@@ -82,4 +82,13 @@ contract LifeformsUser is ERC721TokenReceiver {
     ) public {
         lifeforms.safeTransferFrom(from, to, tokenId, data);
     }
+
+    // ======================
+    // ADMINISTRATIVE METHODS
+    // ======================
+
+    /// @notice Claim is expected to fail for anyone but the owner
+    function claim() public {
+        lifeforms.claim();
+    }
 }

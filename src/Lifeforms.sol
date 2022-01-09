@@ -9,10 +9,11 @@ import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 // Abstracts
 import {ERC721} from "./abstracts/ERC721.sol";
 import {NFTSVG} from "./abstracts/NFTSVG.sol";
+import {Ownable} from "./abstracts/Ownable.sol";
 
 /// @title Lifeforms
 /// @notice Carbon bearing NFT allowing users to store BCT (Base Carbon Tonne) carbon credits inside of NFTs
-contract Lifeforms is ERC721, NFTSVG {
+contract Lifeforms is Ownable, ERC721, NFTSVG {
     using SafeTransferLib for ERC20;
     using FixedPointMathLib for uint256;
 
@@ -20,17 +21,22 @@ contract Lifeforms is ERC721, NFTSVG {
     // EVENTS
     // ======
 
-    /// @notice Emitted after a successful deposit.
+    /// @notice Emitted after a deposit.
     /// @param user The address that deposited into the NFT.
     /// @param tokenId The token id the user deposited to.
     /// @param underlyingAmount The amount of underlying tokens that were deposited.
     event TokenDeposit(address indexed user, uint256 tokenId, uint256 underlyingAmount);
 
-    /// @notice Emitted after a successful withdrawal.
+    /// @notice Emitted after a withdrawal.
     /// @param user The address that withdrew from the NFT.
     /// @param tokenId The token id the user withdrew from.
     /// @param underlyingAmount The amount of underlying tokens that were withdrawn.
     event TokenWithdraw(address indexed user, uint256 tokenId, uint256 underlyingAmount);
+
+    /// @notice Emitted after a claim.
+    /// @param user The address that claimed the ETH.
+    /// @param amount The amount of the ETH balance that was transferred.
+    event Claim(address indexed user, uint256 amount);
 
     // ==================
     // ERC20-LIKE STORAGE
@@ -54,7 +60,7 @@ contract Lifeforms is ERC721, NFTSVG {
     uint256 public immutable BASE_UNIT;
 
     /// @notice Maximum number of token instances that can be minted on this contract.
-    uint256 public maxSupply;
+    uint256 public immutable maxSupply;
 
     // ===========
     // CONSTRUCTOR
@@ -93,9 +99,6 @@ contract Lifeforms is ERC721, NFTSVG {
         require(underlyingAmount != 0, "AMOUNT_CANNOT_BE_ZERO");
         require(_isApprovedOrOwner(tokenId, msg.sender), "TOKEN_MUST_BE_OWNED");
 
-        // Transfer the provided amount of underlying tokens from msg.sender to this contract.
-        UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
-
         // Cannot overflow because a user's balance
         // will never be larger than the total supply.
         unchecked {
@@ -108,6 +111,9 @@ contract Lifeforms is ERC721, NFTSVG {
         );
 
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
+
+        // Transfer the provided amount of underlying tokens from msg.sender to this contract.
+        UNDERLYING.safeTransferFrom(msg.sender, address(this), underlyingAmount);
     }
 
     /// @notice Withdraw a specific amount of underlying tokens from an owned token id.
@@ -126,14 +132,14 @@ contract Lifeforms is ERC721, NFTSVG {
             tokenReserve -= underlyingAmount;
         }
 
-        // Transfer the provided amount of underlying tokens to msg.sender from this contract.
-        UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
-
         tokenURI[tokenId] = generateTokenURI(
             NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
         );
 
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
+
+        // Transfer the provided amount of underlying tokens to msg.sender from this contract.
+        UNDERLYING.safeTransfer(msg.sender, underlyingAmount);
     }
 
     /// @notice Check if spender owns the token or is approved to interact with the token.
@@ -162,6 +168,20 @@ contract Lifeforms is ERC721, NFTSVG {
         tokenURI[id] = generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0}));
 
         return id;
+    }
+
+    // ====================
+    // ADMINISTRATIVE LOGIC
+    // ====================
+
+    /// @notice Claim all received funds.
+    /// @dev Caller will receive any ETH held inside the contract.
+    function claim() external onlyOwner {
+        uint256 selfBalance = address(this).balance;
+
+        emit Claim(msg.sender, selfBalance);
+
+        SafeTransferLib.safeTransferETH(msg.sender, selfBalance);
     }
 
     // ===================
