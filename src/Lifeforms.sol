@@ -4,7 +4,6 @@ pragma solidity >=0.8.0;
 // Vendor
 import {ERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
-import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 
 // Abstracts
 import {ERC721} from "./abstracts/ERC721.sol";
@@ -15,7 +14,6 @@ import {Ownable} from "./abstracts/Ownable.sol";
 /// @notice Carbon bearing NFT allowing users to store BCT (Base Carbon Tonne) carbon credits inside of NFTs.
 contract Lifeforms is Ownable, ERC721, NFTSVG {
     using SafeTransferLib for ERC20;
-    using FixedPointMathLib for uint256;
 
     // ======
     // EVENTS
@@ -146,7 +144,7 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
     function _isApprovedOrOwner(uint256 tokenId, address spender) internal view virtual returns (bool) {
         address owner = ownerOf[tokenId];
         require(owner != address(0), "TOKEN_MUST_EXIST");
-        
+
         return (spender == owner || getApproved[tokenId] == spender || isApprovedForAll[owner][spender]);
     }
 
