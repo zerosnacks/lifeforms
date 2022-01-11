@@ -106,12 +106,13 @@ abstract contract ERC721 {
     ) public virtual {
         transferFrom(from, to, id);
 
-        require(
-            to.code.length == 0 ||
-                ERC721TokenReceiver(to).onERC721Received(msg.sender, from, id, "") ==
-                ERC721TokenReceiver.onERC721Received.selector,
-            "UNSAFE_RECIPIENT"
-        );
+        if (to.code.length != 0) {
+            try ERC721TokenReceiver(to).onERC721Received(msg.sender, from, id, "") returns (bytes4 retval) {
+                require(retval == ERC721TokenReceiver.onERC721Received.selector, "UNSAFE_RECIPIENT");
+            } catch {
+                revert("UNSAFE_RECIPIENT");
+            }
+        }
     }
 
     function safeTransferFrom(
@@ -122,12 +123,13 @@ abstract contract ERC721 {
     ) public virtual {
         transferFrom(from, to, id);
 
-        require(
-            to.code.length == 0 ||
-                ERC721TokenReceiver(to).onERC721Received(msg.sender, from, id, data) ==
-                ERC721TokenReceiver.onERC721Received.selector,
-            "UNSAFE_RECIPIENT"
-        );
+        if (to.code.length != 0) {
+            try ERC721TokenReceiver(to).onERC721Received(msg.sender, from, id, data) returns (bytes4 retval) {
+                require(retval == ERC721TokenReceiver.onERC721Received.selector, "UNSAFE_RECIPIENT");
+            } catch {
+                revert("UNSAFE_RECIPIENT");
+            }
+        }
     }
 
     /*///////////////////////////////////////////////////////////////
