@@ -19,6 +19,7 @@ library Base64 {
         // add some extra buffer at the end required for the writing
         string memory result = new string(encodedLen + 32);
 
+        // solhint-disable-next-line no-inline-assembly
         assembly {
             // set the actual output length
             mstore(result, encodedLen)
@@ -34,11 +35,13 @@ library Base64 {
             let resultPtr := add(result, 32)
 
             // run over the input, 3 bytes at a time
+            /* solhint-disable no-empty-blocks */
             for {
 
             } lt(dataPtr, endPtr) {
 
             } {
+                /* solhint-enable */
                 // read 3 bytes
                 dataPtr := add(dataPtr, 3)
                 let input := mload(dataPtr)

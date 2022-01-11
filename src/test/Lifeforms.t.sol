@@ -12,9 +12,9 @@ import {Lifeforms} from "../Lifeforms.sol";
 // Test utilities
 import {LifeformsUser} from "./users/LifeformsUser.sol";
 
-contract LifeformLogicTest is DSTestPlus {
-    Lifeforms private lifeforms;
-    MockERC20 private underlying;
+contract LifeformsTest is DSTestPlus {
+    Lifeforms lifeforms;
+    MockERC20 underlying;
 
     string private name = "Lifeforms";
     string private symbol = "LIFE";
@@ -200,6 +200,9 @@ contract LifeformLogicTest is DSTestPlus {
 
         // First mint a token
         uint256 tokenId = lifeforms.mint(address(usr));
+        assertEq(lifeforms.totalSupply(), 1);
+        assertEq(lifeforms.balanceOf(address(usr)), 1);
+        assertEq(lifeforms.ownerOf(tokenId), address(usr));
 
         // The operator should not be able to transfer the unapproved token
         try operator.safeTransferFrom(address(usr), address(receiver), tokenId) {
@@ -225,4 +228,34 @@ contract LifeformLogicTest is DSTestPlus {
             assertEq(error, "NOT_AUTHORIZED");
         }
     }
+
+    function testOwner() public {
+        assertEq(lifeforms.owner(), address(this));
+    }
+
+    function testClaim() public {
+        LifeformsUser usr = new LifeformsUser(lifeforms, underlying);
+
+        uint256 initialOwnerBalance = address(this).balance;
+        assertEq(address(lifeforms).balance, 0);
+
+        lifeforms.mint{value: 1 ether}(address(usr));
+        assertEq(address(lifeforms).balance, 1 ether);
+        assertEq(address(this).balance, initialOwnerBalance - 1 ether);
+
+        try usr.claim() {
+            fail();
+        } catch Error(string memory error) {
+            assertEq(error, "NOT_OWNER");
+        }
+
+        lifeforms.claim();
+
+        assertEq(address(lifeforms).balance, 0);
+        assertEq(address(this).balance, initialOwnerBalance);
+    }
+
+    // Required for `testClaim()`
+    // solhint-disable-next-line no-empty-blocks
+    receive() external payable {}
 }

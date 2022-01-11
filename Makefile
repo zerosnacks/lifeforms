@@ -21,8 +21,6 @@ test:; dapp test --verbosity 2 # --ffi # enable if you need the `ffi` cheat code
 clean:; dapp clean
 lint:; yarn run lint
 gas:; dapp snapshot
-estimate:; ./scripts/estimate-gas.sh ${contract}
-size:; ./scripts/contract-size.sh ${contract}
 
 # Deployment helpers
 deploy:; @./scripts/deploy.sh
