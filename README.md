@@ -11,7 +11,8 @@ Carbon bearing NFT - stores [BCT (Base Carbon Tonne)](https://toucan.earth/) car
 ### Rinkeby
 
 - [MockBCT](https://rinkeby.etherscan.io/address/0xEE35A17d801bEb3cED0FC2059AE503aB34c96BE1): 0xEE35A17d801bEb3cED0FC2059AE503aB34c96BE1
-- [Lifeforms](https://rinkeby.etherscan.io/address/0xDA5e79B616087C4Bf92D60C973a344A268F93EEe): 0xDA5e79B616087C4Bf92D60C973a344A268F93EEe
+- [Lifeforms](https://rinkeby.etherscan.io/address/0xcfa19ab9c4a9dfc7f3970d3178e4a231ff28ac54): 0xcFa19ab9c4A9dFc7F3970d3178E4a231fF28AC54
+- [OpenSea](https://testnets.opensea.io/assets/0xcfa19ab9c4a9dfc7f3970d3178e4a231ff28ac54/0)
 
 ## Overview
 

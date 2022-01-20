@@ -30,7 +30,7 @@ deploy-rinkeby: export ETH_RPC_URL = $(call network,rinkeby)
 deploy-rinkeby: check-api-key deploy
 
 # verify on Etherscan
-verify-lifeforms:; ETH_RPC_URL=$(call network,rinkeby) dapp verify-contract src/Lifeforms.sol:Lifeforms 0xDA5e79B616087C4Bf92D60C973a344A268F93EEe 100 0xEE35A17d801bEb3cED0FC2059AE503aB34c96BE1
+verify-lifeforms:; ETH_RPC_URL=$(call network,rinkeby) dapp verify-contract src/Lifeforms.sol:Lifeforms 0xcFa19ab9c4A9dFc7F3970d3178E4a231fF28AC54 100 0xEE35A17d801bEb3cED0FC2059AE503aB34c96BE1
 verify-mbct:; ETH_RPC_URL=$(call network,rinkeby) dapp verify-contract src/MockBCT.sol:MockBCT 0xEE35A17d801bEb3cED0FC2059AE503aB34c96BE1 \"MockBCT\" \"MBCT\" 18
 
 check-api-key:
