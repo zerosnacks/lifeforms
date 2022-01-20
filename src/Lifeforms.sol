@@ -103,10 +103,6 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
             tokenReserve += underlyingAmount;
         }
 
-        tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
-        );
-
         emit TokenDeposit(msg.sender, tokenId, underlyingAmount);
 
         // Transfer the provided amount of underlying tokens from msg.sender to this contract.
@@ -128,10 +124,6 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
             tokenReserve -= underlyingAmount;
         }
 
-        tokenURI[tokenId] = generateTokenURI(
-            NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT})
-        );
-
         emit TokenWithdraw(msg.sender, tokenId, underlyingAmount);
 
         // Transfer the provided amount of underlying tokens to msg.sender from this contract.
@@ -148,9 +140,15 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
         return (spender == owner || getApproved[tokenId] == spender || isApprovedForAll[owner][spender]);
     }
 
-    // ==========
-    // MINT LOGIC
-    // ==========
+    // ============
+    // ERC721 LOGIC
+    // ============
+
+    function tokenURI(uint256 tokenId) public view returns (string memory) {
+        require(ownerOf[tokenId] != address(0), "NOT_MINTED");
+
+        return generateTokenURI(NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT}));
+    }
 
     /// @notice Mint token to address.
     /// @param to The address to mint to.
@@ -160,8 +158,6 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
         uint256 id = totalSupply;
 
         _safeMint(to, id);
-
-        tokenURI[id] = generateTokenURI(NFTSVG.SVGParams({tokenId: id, tokenBalance: 0}));
 
         return id;
     }

@@ -2,7 +2,6 @@
 pragma solidity >=0.8.0;
 
 /// @notice Modern, minimalist, and gas efficient ERC-721 implementation.
-/// @notice Updated tokenURI, custom mapping implementation, different from solmate/tokens/ERC721.sol
 /// @notice Added totalSupply, addition to solmate/tokens/ERC721.sol
 /// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/tokens/ERC721.sol)
 /// @dev Note that balanceOf does not revert if passed the zero address, in defiance of the ERC.
@@ -24,8 +23,6 @@ abstract contract ERC721 {
     string public name;
 
     string public symbol;
-
-    mapping(uint256 => string) public tokenURI;
 
     /*///////////////////////////////////////////////////////////////
                             ERC721 STORAGE                        

@@ -37,6 +37,26 @@ contract LifeformsTest is DSTestPlus {
         assertEq(lifeforms.symbol(), symbol);
     }
 
+    function testTokenURI() public {
+        LifeformsUser usr = new LifeformsUser(lifeforms, underlying);
+
+        underlying.mint(address(usr), 10e18);
+        usr.approveToken(10e18);
+
+        uint256 tokenId = lifeforms.mint(address(usr));
+        assertEq(lifeforms.totalSupply(), 1);
+        assertEq(lifeforms.balanceOf(address(usr)), 1);
+        assertEq(lifeforms.ownerOf(tokenId), address(usr));
+
+        emit log_named_string("tokenURI", lifeforms.tokenURI(tokenId));
+
+        usr.depositToken(tokenId, 5e18);
+        assertEq(lifeforms.tokenBalances(tokenId), 5e18);
+        assertEq(underlying.balanceOf(address(usr)), 5e18);
+
+        emit log_named_string("tokenURI", lifeforms.tokenURI(tokenId));
+    }
+
     function testMintCap(address usr) public {
         // Contract reverts on address(0) as it is not a valid receiver
         // For fuzzing we override this path with a valid path
@@ -81,18 +101,12 @@ contract LifeformsTest is DSTestPlus {
 
         assertEq(lifeforms.tokenBalances(tokenId), 0);
 
-        emit log_named_string("TokenURI 0 BCT", lifeforms.tokenURI(tokenId));
-
         usr.depositToken(tokenId, 5e18);
         assertEq(lifeforms.tokenBalances(tokenId), 5e18);
         assertEq(underlying.balanceOf(address(usr)), 5e18);
 
-        emit log_named_string("TokenURI 5 BCT", lifeforms.tokenURI(tokenId));
-
         usr.withdrawToken(tokenId, 5e18);
         assertEq(lifeforms.tokenBalances(tokenId), 0);
-
-        emit log_named_string("TokenURI 0 BCT", lifeforms.tokenURI(tokenId));
 
         assertEq(underlying.balanceOf(address(usr)), preDepositBal);
     }
