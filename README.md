@@ -36,7 +36,7 @@ This on-chain demand is directly reflected - be it on a micro-scale - in the rea
 
 ## How?
 
-After approving with `approveToken` users deposit BCT tokens into the `Lifeforms` contract address using `depositToken`. Internally a balance is tied to the `tokenId` instead of the address the user deposited the tokens with. When the NFT is transferred the `tokenBalance` remains tied to the `tokenId` meaning the BCT tokens remain tied to the NFT, not the depositor. If the user desires they can withdraw their deposited BCT tokens at any time using the `withdrawToken` method except after the NFT itself has been transferred already. This will in turn update the token to reflect its current balance with the according level of visual fidelity.
+After approving with `approveToken` users deposit BCT tokens into the `Lifeforms` contract address using `depositToken`. Internally a balance is tied to the `tokenId` instead of the address the user deposited the tokens with. When the NFT is transferred the `tokenBalance` remains tied to the `tokenId` meaning the BCT tokens remain tied to the NFT, not the depositor. If the user desires they can withdraw their deposited BCT tokens at any time using the `withdrawToken` method except after the NFT itself has been transferred already. By calling `tokenURI` (free) you dynamically construct the SVG and metadata to reflect its current balance with the according level of visual fidelity.
 
 The artwork is composed as an on-chain `SVG` on mint and is dynamically updated to reflect the current BCT balance of the NFT whenever the user deposits into or withdraws BCT tokens from the NFT.
 
