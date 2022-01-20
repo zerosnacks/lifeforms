@@ -3,10 +3,10 @@ pragma solidity >=0.8.0;
 
 // Vendor
 import {ERC20} from "solmate/tokens/ERC20.sol";
+import {ERC721} from "solmate/tokens/ERC721.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
 // Abstracts
-import {ERC721} from "./abstracts/ERC721.sol";
 import {NFTSVG} from "./abstracts/NFTSVG.sol";
 import {Ownable} from "./abstracts/Ownable.sol";
 
@@ -144,7 +144,7 @@ contract Lifeforms is Ownable, ERC721, NFTSVG {
     // ERC721 LOGIC
     // ============
 
-    function tokenURI(uint256 tokenId) public view returns (string memory) {
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(ownerOf[tokenId] != address(0), "NOT_MINTED");
 
         return generateTokenURI(NFTSVG.SVGParams({tokenId: tokenId, tokenBalance: tokenBalances[tokenId] / BASE_UNIT}));
